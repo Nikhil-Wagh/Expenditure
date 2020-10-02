@@ -6,6 +6,10 @@ class LoadingFirebase extends StatefulWidget {
 }
 
 class _LoadingFirebaseState extends State<LoadingFirebase> {
+  /* 
+   * Loading screen when plugins are loading
+   * TODO: Make a good loading screen
+   */
   @override
   Widget build(BuildContext context) {
     return Container(
