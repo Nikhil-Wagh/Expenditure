@@ -61,14 +61,27 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
         body: TabBarView(
           controller: _tabController,
           children: authTabs.map((Tab tab) {
-            final String label = tab.text.toLowerCase();
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Center(
-                child: Text(
-                  'This is the $label tab',
-                  style: const TextStyle(fontSize: 36),
-                ),
+            return Container(
+              alignment: Alignment.bottomCenter,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: Transform.translate(
+                      offset: Offset(0, 150),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(30),
+                            topRight: Radius.circular(30),
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
               ),
             );
           }).toList(),
