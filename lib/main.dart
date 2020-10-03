@@ -5,6 +5,9 @@ import 'package:provider/provider.dart';
 
 import 'models/user.dart';
 import 'screens/errors/something_went_wrong.dart';
+import 'screens/wrapper.dart';
+import 'services/auth.dart';
+import 'constants.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +33,7 @@ class MyApp extends StatelessWidget {
             value: AuthService().user,
             child: MaterialApp(
               theme: ThemeData(
-                primarySwatch: Colors.deepOrange,
+                primarySwatch: primaryColor,
                 visualDensity: VisualDensity.adaptivePlatformDensity,
               ),
               home: Wrapper(),

@@ -1,12 +1,14 @@
 // Strings
 import 'package:flutter/material.dart';
 
-var welcome = "Welcome";
+const welcome = "Welcome";
 
 // Colors
-var primary = Colors.deepOrange;
-var primaryAccent = Colors.deepOrangeAccent;
+const primaryColor = Colors.deepOrange;
+const primaryAccentColor = Colors.deepOrangeAccent;
+const mTextColor = Colors.white;
+const mUnselectedTextColor = Colors.grey;
 
 // Dimensions
-var mPadding = 8.0;
-var mMargin = 8.0;
+const mPadding = 8.0;
+const mMargin = 8.0;
