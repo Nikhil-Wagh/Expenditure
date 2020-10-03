@@ -46,9 +46,9 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
                     isScrollable: true,
                     indicator: UnderlineTabIndicator(
                       borderSide: BorderSide(width: 4, color: Colors.white),
-                      insets: EdgeInsets.only(left: 0, right: 8, bottom: 4),
+                      insets: EdgeInsets.only(left: -7, right: 8, bottom: 4),
                     ),
-                    labelPadding: EdgeInsets.only(left: 0, right: 8),
+                    labelPadding: EdgeInsets.only(left: 0, right: 16),
                     indicatorSize: TabBarIndicatorSize.label,
                     tabs: authTabs,
                     controller: _tabController,
