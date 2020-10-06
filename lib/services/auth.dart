@@ -39,6 +39,22 @@ class AuthService {
       return AuthResult(message: 'Something went wrong, please try again');
     }
   }
+
+  validateEmail(String email) {
+    if (email.isEmpty)
+      return 'Enter an email';
+    else if (!email.contains('@') || email.split('@').length < 2 || (!email.split('@')[1].contains('.com')))
+      return 'Not a valid email address';
+    else
+      null;
+  }
+
+  validatePassword(String password) {
+    if (password.length < 6) {
+      return 'Password must be atleast of 6 characters';
+    } else
+      return null;
+  }
 }
 
 class AuthResult {
