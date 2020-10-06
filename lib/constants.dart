@@ -2,6 +2,9 @@
 import 'package:flutter/material.dart';
 
 const welcome = "Welcome";
+const helloString = "Hello";
+const createAccountString = "Log into your Expenditure account to analyze your spending, create a monthly budget and save more money";
+const motoString = "A penny saved is a penny earned";
 
 // Colors
 const primaryColor = Colors.orange;
