@@ -1,3 +1,5 @@
+import 'package:expenditure/constants.dart';
+import 'package:expenditure/services/auth.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -6,6 +8,8 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  AuthService auth = AuthService();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,6 +29,12 @@ class _HomeState extends State<Home> {
             Text(
               'You should see this when authenticated',
             ),
+            SizedBox(height: 8.0),
+            RaisedButton(
+              color: primaryColor,
+              onPressed: () => auth.signOut(),
+              child: Text('Sign Out'),
+            )
           ],
         ),
       ),

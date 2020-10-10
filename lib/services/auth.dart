@@ -56,6 +56,18 @@ class AuthService {
     }
   }
 
+  Future signInWithGoogle() async {}
+
+  Future signInWithFacebook() async {}
+
+  Future signInWithTwitter() async {}
+
+  Future signInWithApple() async {}
+
+  signOut() {
+    _firebaseAuth.signOut();
+  }
+
   validateEmail(String email) {
     if (email.isEmpty)
       return 'Enter an email';

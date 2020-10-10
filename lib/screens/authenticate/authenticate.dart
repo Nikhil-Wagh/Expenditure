@@ -148,8 +148,8 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
             padding: const EdgeInsets.only(
               left: 32,
               right: 32,
-              top: 48,
-              bottom: 24,
+              top: 40,
+              bottom: 16,
             ),
             child: signIn ? _signInForm() : _signUpForm(),
           ),
@@ -158,6 +158,7 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
     );
   }
 
+  // TODO: A lot of redundancy can be reduced in sign in sign up
   Form _signInForm() {
     return Form(
       key: _SignInFormKey,
@@ -189,7 +190,61 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
               setState(() => password = val.trim());
             },
           ),
-          SizedBox(height: 10.0),
+          SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Card(
+                child: IconButton(
+                  icon: Image.asset(
+                    'assets/images/Google.png',
+                    height: 24,
+                  ),
+                  iconSize: 16,
+                  padding: EdgeInsets.all(0.0),
+                  onPressed: () async {
+                    dynamic result = await _auth.signInWithGoogle();
+                  },
+                ),
+              ),
+              Card(
+                child: IconButton(
+                  icon: Image.asset(
+                    'assets/images/Facebook.png',
+                    height: 24,
+                  ),
+                  onPressed: () async {
+                    dynamic result = await _auth.signInWithFacebook();
+                  },
+                ),
+              ),
+              Card(
+                child: IconButton(
+                  icon: Image.asset(
+                    'assets/images/Twitter.png',
+                    height: 24,
+                  ),
+                  padding: EdgeInsets.all(8.0),
+                  onPressed: () async {
+                    dynamic result = await _auth.signInWithTwitter();
+                  },
+                ),
+              ),
+              Card(
+                child: IconButton(
+                  icon: Image.asset(
+                    'assets/images/Apple.png',
+                    height: 24,
+                  ),
+                  padding: EdgeInsets.all(11.0),
+                  onPressed: () async {
+                    dynamic result = _auth.signInWithApple();
+                  },
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 8.0),
           RaisedButton(
             color: Colors.orange,
             shape: RoundedRectangleBorder(
@@ -272,7 +327,63 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
               setState(() => confirmPassword = val.trim());
             },
           ),
-          SizedBox(height: 10.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Card(
+                child: IconButton(
+                  icon: Image.asset(
+                    'assets/images/Google.png',
+                    height: 24,
+                  ),
+                  iconSize: 16,
+                  padding: EdgeInsets.all(0.0),
+                  onPressed: () async {
+                    dynamic result = await _auth.signInWithGoogle();
+                  },
+                ),
+              ),
+              Card(
+                child: IconButton(
+                  icon: Image.asset(
+                    'assets/images/Facebook.png',
+                    height: 24,
+                  ),
+                  onPressed: () async {
+                    dynamic result = await _auth.signInWithFacebook();
+                  },
+                ),
+              ),
+              Card(
+                child: IconButton(
+                  icon: Image.asset(
+                    'assets/images/Twitter.png',
+                    height: 24,
+                  ),
+                  padding: EdgeInsets.all(8.0),
+                  onPressed: () async {
+                    dynamic result = await _auth.signInWithTwitter();
+                  },
+                ),
+              ),
+              Card(
+                child: IconButton(
+                  icon: Image.asset(
+                    'assets/images/Apple.png',
+                    height: 24,
+                  ),
+                  padding: EdgeInsets.all(11.0),
+                  onPressed: () async {
+                    dynamic result = _auth.signInWithApple();
+                  },
+                ),
+              ),
+              // Image(
+              //   image: AssetImage('assets/images/Google.png'),
+              //   height: 24.0,
+              // ),
+            ],
+          ),
           RaisedButton(
             color: Colors.orange,
             shape: RoundedRectangleBorder(
