@@ -40,13 +40,29 @@ class AuthService {
     }
   }
 
+  Future signInEmailAndPassword(String email, password) async {
+    try {
+      auth.UserCredential userCredential = await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
+      return AuthResult(user: _userFromFirebaseUser(userCredential.user));
+    } on auth.FirebaseAuthException catch (e) {
+      print('[ERROR] signInEmailAndPassword(): error = ' + e.toString());
+
+      return AuthResult(message: e.message);
+    } catch (e) {
+      // TODO: Notify dev about this exception
+      print("[ERROR] error = " + e);
+
+      return AuthResult(message: 'Something went wrong, please try again');
+    }
+  }
+
   validateEmail(String email) {
     if (email.isEmpty)
       return 'Enter an email';
     else if (!email.contains('@') || email.split('@').length < 2 || (!email.split('@')[1].contains('.com')))
       return 'Not a valid email address';
     else
-      null;
+      return null;
   }
 
   validatePassword(String password) {
@@ -54,6 +70,12 @@ class AuthService {
       return 'Password must be atleast of 6 characters';
     } else
       return null;
+  }
+
+  validateConfirmPassword(String password, String confirmPassword) {
+    if (password != confirmPassword) {
+      return 'Password don\'t match';
+    }
   }
 }
 
@@ -66,11 +88,11 @@ class AuthResult {
 
   AuthResult({this.user, this.message});
 
-  bool hasError() {
+  bool hasErrors() {
     return this.message == null ? false : true;
   }
 
-  String exceptionMessage() {
+  String errorMessage() {
     if (message != null) return message;
     return null; // Don't like this
   }

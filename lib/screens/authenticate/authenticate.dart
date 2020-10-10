@@ -20,6 +20,7 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
 
   String email = '';
   String password = '';
+  String confirmPassword = '';
   String error = '';
 
   String passwordError = null;
@@ -147,8 +148,8 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
             padding: const EdgeInsets.only(
               left: 32,
               right: 32,
-              top: 50,
-              bottom: 32,
+              top: 48,
+              bottom: 24,
             ),
             child: signIn ? _signInForm() : _signUpForm(),
           ),
@@ -169,7 +170,6 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
             decoration: InputDecoration(
               border: OutlineInputBorder(),
               labelText: "Email",
-              errorText: emailError,
             ),
             validator: (value) => _auth.validateEmail(value),
             onChanged: (val) {
@@ -182,7 +182,6 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
             decoration: InputDecoration(
               border: OutlineInputBorder(),
               labelStyle: TextStyle(fontSize: 14),
-              errorText: passwordError,
               labelText: "Password",
             ),
             validator: (value) => _auth.validatePassword(value),
@@ -202,15 +201,28 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
             ),
             onPressed: () async {
               if (_SignInFormKey.currentState.validate()) {
-                dynamic result = await _auth.signUpEmailAndPassword(email, password);
+                dynamic result = await _auth.signInEmailAndPassword(email, password);
                 if (result.hasErrors()) {
                   setState(() {
-                    error = result.errorMessage;
+                    error = result.errorMessage();
                   });
                 }
               }
             },
           ),
+          Visibility(
+            visible: error.isNotEmpty,
+            child: Column(
+              children: [
+                SizedBox(height: 20),
+                Text(
+                  error,
+                  style: TextStyle(color: Colors.red, fontSize: 14.0),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          )
         ],
       ),
     );
@@ -241,7 +253,6 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
             decoration: InputDecoration(
               border: OutlineInputBorder(),
               labelStyle: TextStyle(fontSize: 14),
-              errorText: passwordError,
               labelText: "Password",
             ),
             validator: (value) => _auth.validatePassword(value),
@@ -254,12 +265,11 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
             decoration: InputDecoration(
               border: OutlineInputBorder(),
               labelStyle: TextStyle(fontSize: 14),
-              errorText: passwordError,
               labelText: "Confirm Password",
             ),
-            validator: (value) => _auth.validatePassword(value),
+            validator: (value) => _auth.validateConfirmPassword(password, value),
             onChanged: (val) {
-              setState(() => password = val.trim());
+              setState(() => confirmPassword = val.trim());
             },
           ),
           SizedBox(height: 10.0),
@@ -269,20 +279,33 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
               borderRadius: BorderRadius.circular(4.0),
             ),
             child: Text(
-              'Sign In',
+              'Sign Up',
               style: TextStyle(color: Colors.white),
             ),
             onPressed: () async {
-              if (_SignInFormKey.currentState.validate()) {
+              if (_SignUpFormKey.currentState.validate()) {
                 dynamic result = await _auth.signUpEmailAndPassword(email, password);
                 if (result.hasErrors()) {
                   setState(() {
-                    error = result.errorMessage;
+                    error = result.errorMessage();
                   });
                 }
               }
             },
           ),
+          Visibility(
+            visible: error.isNotEmpty,
+            child: Column(
+              children: [
+                SizedBox(height: 16),
+                Text(
+                  error,
+                  style: TextStyle(color: Colors.red, fontSize: 14.0),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          )
         ],
       ),
     );
