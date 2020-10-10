@@ -16,10 +16,14 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
 
   final AuthService _auth = AuthService();
   final _SignInFormKey = GlobalKey<FormState>();
+  final _SignUpFormKey = GlobalKey<FormState>();
 
   String email = '';
   String password = '';
   String error = '';
+
+  String passwordError = null;
+  String emailError = null;
 
   @override
   void initState() {
@@ -119,14 +123,13 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
     return TabBarView(
       controller: _tabController,
       children: [
-        _signInTab(),
-        _signUpTab(),
+        _authSkeleton(signIn: true),
+        _authSkeleton(signIn: false),
       ],
     );
   }
 
-  // TODO: Move text fields into view when focused
-  Column _authSkeleton() {
+  Column _authSkeleton({signIn: true}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
@@ -141,85 +144,147 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
             ),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 50,
-              horizontal: 32,
+            padding: const EdgeInsets.only(
+              left: 32,
+              right: 32,
+              top: 50,
+              bottom: 32,
             ),
-            child: Form(
-              // key: _SignInFormKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                verticalDirection: VerticalDirection.down,
-                children: <Widget>[
-                  TextFormField(
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(border: OutlineInputBorder(), labelText: "Email"),
-                    validator: (value) => _auth.validateEmail(value),
-                    onChanged: (val) {
-                      setState(() => email = val.trim());
-                    },
-                  ),
-                  SizedBox(height: 16.0),
-                  TextFormField(
-                    obscureText: true,
-                    decoration: InputDecoration(border: OutlineInputBorder(), labelText: "Password"),
-                    validator: (value) => _auth.validatePassword(value),
-                    onChanged: (val) {
-                      setState(() => password = val.trim());
-                    },
-                  ),
-                  SizedBox(height: 20.0),
-                  RaisedButton(
-                    color: Colors.orange,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4.0),
-                    ),
-                    child: Text(
-                      'Sign In',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    onPressed: () async {
-                      if (_SignInFormKey.currentState.validate()) {
-                        dynamic result = await _auth.signUpEmailAndPassword(email, password);
-                        if (result.hasErrors()) {
-                          setState(() {
-                            error = result.errorMessage;
-                          });
-                        }
-                      }
-                    },
-                  ),
-                  Visibility(
-                    visible: error.isNotEmpty,
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: 30.0,
-                        ),
-                        Text(
-                          error,
-                          style: TextStyle(color: Colors.red, fontSize: 14.0),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
+            child: signIn ? _signInForm() : _signUpForm(),
           ),
         )
       ],
     );
   }
 
-  validateEmail() {}
-
-  Column _signInTab() {
-    return _authSkeleton();
+  Form _signInForm() {
+    return Form(
+      key: _SignInFormKey,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        verticalDirection: VerticalDirection.down,
+        children: <Widget>[
+          TextFormField(
+            keyboardType: TextInputType.emailAddress,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: "Email",
+              errorText: emailError,
+            ),
+            validator: (value) => _auth.validateEmail(value),
+            onChanged: (val) {
+              setState(() => email = val.trim());
+            },
+          ),
+          SizedBox(height: 8.0),
+          TextFormField(
+            obscureText: true,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelStyle: TextStyle(fontSize: 14),
+              errorText: passwordError,
+              labelText: "Password",
+            ),
+            validator: (value) => _auth.validatePassword(value),
+            onChanged: (val) {
+              setState(() => password = val.trim());
+            },
+          ),
+          SizedBox(height: 10.0),
+          RaisedButton(
+            color: Colors.orange,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4.0),
+            ),
+            child: Text(
+              'Sign In',
+              style: TextStyle(color: Colors.white),
+            ),
+            onPressed: () async {
+              if (_SignInFormKey.currentState.validate()) {
+                dynamic result = await _auth.signUpEmailAndPassword(email, password);
+                if (result.hasErrors()) {
+                  setState(() {
+                    error = result.errorMessage;
+                  });
+                }
+              }
+            },
+          ),
+        ],
+      ),
+    );
   }
 
-  Column _signUpTab() {
-    return _authSkeleton();
+  Form _signUpForm() {
+    return Form(
+      key: _SignUpFormKey,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        verticalDirection: VerticalDirection.down,
+        children: <Widget>[
+          TextFormField(
+            keyboardType: TextInputType.emailAddress,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: "Email",
+              errorText: emailError,
+            ),
+            validator: (value) => _auth.validateEmail(value),
+            onChanged: (val) {
+              setState(() => email = val.trim());
+            },
+          ),
+          SizedBox(height: 8.0),
+          TextFormField(
+            obscureText: true,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelStyle: TextStyle(fontSize: 14),
+              errorText: passwordError,
+              labelText: "Password",
+            ),
+            validator: (value) => _auth.validatePassword(value),
+            onChanged: (val) {
+              setState(() => password = val.trim());
+            },
+          ),
+          SizedBox(height: 8),
+          TextFormField(
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelStyle: TextStyle(fontSize: 14),
+              errorText: passwordError,
+              labelText: "Confirm Password",
+            ),
+            validator: (value) => _auth.validatePassword(value),
+            onChanged: (val) {
+              setState(() => password = val.trim());
+            },
+          ),
+          SizedBox(height: 10.0),
+          RaisedButton(
+            color: Colors.orange,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4.0),
+            ),
+            child: Text(
+              'Sign In',
+              style: TextStyle(color: Colors.white),
+            ),
+            onPressed: () async {
+              if (_SignInFormKey.currentState.validate()) {
+                dynamic result = await _auth.signUpEmailAndPassword(email, password);
+                if (result.hasErrors()) {
+                  setState(() {
+                    error = result.errorMessage;
+                  });
+                }
+              }
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
