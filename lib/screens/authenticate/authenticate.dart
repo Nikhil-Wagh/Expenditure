@@ -86,7 +86,6 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
       padding: EdgeInsets.all(20),
       child: SizedBox(
         width: double.infinity,
-        height: double.infinity,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,
@@ -126,76 +125,74 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
     );
   }
 
-  Container _authSkeleton() {
-    return Container(
-      alignment: Alignment.bottomCenter,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Expanded(
-            child: Transform.translate(
-              offset: Offset(
-                0,
-                MediaQuery.of(context).size.height / 3.5,
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
+  // TODO: Move text fields into view when focused
+  Column _authSkeleton() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 50,
+              horizontal: 32,
+            ),
+            child: Form(
+              // key: _SignInFormKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                verticalDirection: VerticalDirection.down,
+                children: <Widget>[
+                  TextFormField(
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(border: OutlineInputBorder(), labelText: "Email"),
+                    validator: (value) => _auth.validateEmail(value),
+                    onChanged: (val) {
+                      setState(() => email = val.trim());
+                    },
                   ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 70,
-                    horizontal: 32,
+                  SizedBox(height: 16.0),
+                  TextFormField(
+                    obscureText: true,
+                    decoration: InputDecoration(border: OutlineInputBorder(), labelText: "Password"),
+                    validator: (value) => _auth.validatePassword(value),
+                    onChanged: (val) {
+                      setState(() => password = val.trim());
+                    },
                   ),
-                  child: Form(
-                    // key: _SignInFormKey,
+                  SizedBox(height: 20.0),
+                  RaisedButton(
+                    color: Colors.orange,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4.0),
+                    ),
+                    child: Text(
+                      'Sign In',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () async {
+                      if (_SignInFormKey.currentState.validate()) {
+                        dynamic result = await _auth.signUpEmailAndPassword(email, password);
+                        if (result.hasErrors()) {
+                          setState(() {
+                            error = result.errorMessage;
+                          });
+                        }
+                      }
+                    },
+                  ),
+                  Visibility(
+                    visible: error.isNotEmpty,
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      verticalDirection: VerticalDirection.down,
-                      children: <Widget>[
-                        TextFormField(
-                          keyboardType: TextInputType.emailAddress,
-                          decoration: InputDecoration(border: OutlineInputBorder(), labelText: "Email"),
-                          validator: (value) => _auth.validateEmail(value),
-                          onChanged: (val) {
-                            setState(() => email = val.trim());
-                          },
-                        ),
-                        SizedBox(height: 16.0),
-                        TextFormField(
-                          obscureText: true,
-                          decoration: InputDecoration(border: OutlineInputBorder(), labelText: "Password"),
-                          validator: (value) => _auth.validatePassword(value),
-                          onChanged: (val) {
-                            setState(() => password = val.trim());
-                          },
-                        ),
-                        SizedBox(height: 20.0),
-                        RaisedButton(
-                          color: Colors.orange,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4.0),
-                          ),
-                          child: Text(
-                            'Sign In',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          onPressed: () async {
-                            if (_SignInFormKey.currentState.validate()) {
-                              dynamic result = await _auth.signUpEmailAndPassword(email, password);
-                              if (result.hasErrors()) {
-                                setState(() {
-                                  error = result.errorMessage;
-                                });
-                              }
-                            }
-                          },
-                        ),
+                      children: [
                         SizedBox(
                           height: 30.0,
                         ),
@@ -206,23 +203,23 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
                         ),
                       ],
                     ),
-                  ),
-                ),
+                  )
+                ],
               ),
             ),
-          )
-        ],
-      ),
+          ),
+        )
+      ],
     );
   }
 
   validateEmail() {}
 
-  Container _signInTab() {
+  Column _signInTab() {
     return _authSkeleton();
   }
 
-  Container _signUpTab() {
+  Column _signUpTab() {
     return _authSkeleton();
   }
 }
