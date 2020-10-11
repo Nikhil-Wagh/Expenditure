@@ -1,5 +1,6 @@
 import 'package:expenditure/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
   /* 
@@ -56,7 +57,17 @@ class AuthService {
     }
   }
 
-  Future signInWithGoogle() async {}
+  Future signInWithGoogle() async {
+    final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    final auth.GoogleAuthCredential googleCredential = auth.GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    auth.UserCredential userCredential = await _firebaseAuth.signInWithCredential(googleCredential);
+    return AuthResult(user: _userFromFirebaseUser(userCredential.user));
+  }
 
   Future signInWithFacebook() async {}
 
