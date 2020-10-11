@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:expenditure/constants.dart';
 import 'package:expenditure/services/auth.dart';
 import 'package:flutter/material.dart';
@@ -158,7 +160,6 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
     );
   }
 
-  // TODO: A lot of redundancy can be reduced in sign in sign up
   Form _signInForm() {
     return Form(
       key: _SignInFormKey,
@@ -166,17 +167,7 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
         mainAxisAlignment: MainAxisAlignment.start,
         verticalDirection: VerticalDirection.down,
         children: <Widget>[
-          TextFormField(
-            keyboardType: TextInputType.emailAddress,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: "Email",
-            ),
-            validator: (value) => _auth.validateEmail(value),
-            onChanged: (val) {
-              setState(() => email = val.trim());
-            },
-          ),
+          _emailFormField(),
           SizedBox(height: 8.0),
           TextFormField(
             obscureText: true,
@@ -190,61 +181,7 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
               setState(() => password = val.trim());
             },
           ),
-          SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Card(
-                child: IconButton(
-                  icon: Image.asset(
-                    'assets/images/Google.png',
-                    height: 24,
-                  ),
-                  iconSize: 16,
-                  padding: EdgeInsets.all(0.0),
-                  onPressed: () async {
-                    dynamic result = await _auth.signInWithGoogle();
-                  },
-                ),
-              ),
-              Card(
-                child: IconButton(
-                  icon: Image.asset(
-                    'assets/images/Facebook.png',
-                    height: 24,
-                  ),
-                  onPressed: () async {
-                    dynamic result = await _auth.signInWithFacebook();
-                  },
-                ),
-              ),
-              Card(
-                child: IconButton(
-                  icon: Image.asset(
-                    'assets/images/Twitter.png',
-                    height: 24,
-                  ),
-                  padding: EdgeInsets.all(8.0),
-                  onPressed: () async {
-                    dynamic result = await _auth.signInWithTwitter();
-                  },
-                ),
-              ),
-              Card(
-                child: IconButton(
-                  icon: Image.asset(
-                    'assets/images/Apple.png',
-                    height: 24,
-                  ),
-                  padding: EdgeInsets.all(11.0),
-                  onPressed: () async {
-                    dynamic result = _auth.signInWithApple();
-                  },
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 8.0),
+          _loginWithOptionsRow(),
           RaisedButton(
             color: Colors.orange,
             shape: RoundedRectangleBorder(
@@ -265,19 +202,7 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
               }
             },
           ),
-          Visibility(
-            visible: error.isNotEmpty,
-            child: Column(
-              children: [
-                SizedBox(height: 20),
-                Text(
-                  error,
-                  style: TextStyle(color: Colors.red, fontSize: 14.0),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          )
+          _authErrorMessageBlock(),
         ],
       ),
     );
@@ -290,32 +215,10 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
         mainAxisAlignment: MainAxisAlignment.start,
         verticalDirection: VerticalDirection.down,
         children: <Widget>[
-          TextFormField(
-            keyboardType: TextInputType.emailAddress,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: "Email",
-              errorText: emailError,
-            ),
-            validator: (value) => _auth.validateEmail(value),
-            onChanged: (val) {
-              setState(() => email = val.trim());
-            },
-          ),
-          SizedBox(height: 8.0),
-          TextFormField(
-            obscureText: true,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelStyle: TextStyle(fontSize: 14),
-              labelText: "Password",
-            ),
-            validator: (value) => _auth.validatePassword(value),
-            onChanged: (val) {
-              setState(() => password = val.trim());
-            },
-          ),
-          SizedBox(height: 8),
+          _emailFormField(),
+          SizedBox(height: mPadding),
+          _passwordFormField(),
+          SizedBox(height: mPadding),
           TextFormField(
             decoration: InputDecoration(
               border: OutlineInputBorder(),
@@ -327,63 +230,7 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
               setState(() => confirmPassword = val.trim());
             },
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Card(
-                child: IconButton(
-                  icon: Image.asset(
-                    'assets/images/Google.png',
-                    height: 24,
-                  ),
-                  iconSize: 16,
-                  padding: EdgeInsets.all(0.0),
-                  onPressed: () async {
-                    dynamic result = await _auth.signInWithGoogle();
-                  },
-                ),
-              ),
-              Card(
-                child: IconButton(
-                  icon: Image.asset(
-                    'assets/images/Facebook.png',
-                    height: 24,
-                  ),
-                  onPressed: () async {
-                    dynamic result = await _auth.signInWithFacebook();
-                  },
-                ),
-              ),
-              Card(
-                child: IconButton(
-                  icon: Image.asset(
-                    'assets/images/Twitter.png',
-                    height: 24,
-                  ),
-                  padding: EdgeInsets.all(8.0),
-                  onPressed: () async {
-                    dynamic result = await _auth.signInWithTwitter();
-                  },
-                ),
-              ),
-              Card(
-                child: IconButton(
-                  icon: Image.asset(
-                    'assets/images/Apple.png',
-                    height: 24,
-                  ),
-                  padding: EdgeInsets.all(11.0),
-                  onPressed: () async {
-                    dynamic result = _auth.signInWithApple();
-                  },
-                ),
-              ),
-              // Image(
-              //   image: AssetImage('assets/images/Google.png'),
-              //   height: 24.0,
-              // ),
-            ],
-          ),
+          _loginWithOptionsRow(),
           RaisedButton(
             color: Colors.orange,
             shape: RoundedRectangleBorder(
@@ -404,21 +251,106 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
               }
             },
           ),
-          Visibility(
-            visible: error.isNotEmpty,
-            child: Column(
-              children: [
-                SizedBox(height: 16),
-                Text(
-                  error,
-                  style: TextStyle(color: Colors.red, fontSize: 14.0),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          )
+          _authErrorMessageBlock(),
         ],
       ),
+    );
+  }
+
+  TextFormField _emailFormField() {
+    return TextFormField(
+      keyboardType: TextInputType.emailAddress,
+      decoration: InputDecoration(
+        border: OutlineInputBorder(),
+        labelText: "Email",
+      ),
+      validator: (value) => _auth.validateEmail(value),
+      onChanged: (val) {
+        setState(() => email = val.trim());
+      },
+    );
+  }
+
+  TextFormField _passwordFormField() {
+    return TextFormField(
+      obscureText: true,
+      decoration: InputDecoration(
+        border: OutlineInputBorder(),
+        labelStyle: TextStyle(fontSize: 14),
+        labelText: "Password",
+      ),
+      validator: (value) => _auth.validatePassword(value),
+      onChanged: (val) {
+        setState(() => password = val.trim());
+      },
+    );
+  }
+
+  Visibility _authErrorMessageBlock() {
+    return Visibility(
+      visible: error.isNotEmpty,
+      child: Column(
+        children: [
+          SizedBox(height: 20),
+          Text(
+            error,
+            style: TextStyle(color: Colors.red, fontSize: 14.0),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Row _loginWithOptionsRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Card(
+          child: IconButton(
+            icon: Image.asset(
+              'assets/images/Google.png',
+              height: 24,
+            ),
+            onPressed: () async {
+              dynamic result = await _auth.signInWithGoogle();
+            },
+          ),
+        ),
+        Card(
+          child: IconButton(
+            icon: Image.asset(
+              'assets/images/Facebook.png',
+              height: 24,
+            ),
+            onPressed: () async {
+              dynamic result = await _auth.signInWithFacebook();
+            },
+          ),
+        ),
+        Card(
+          child: IconButton(
+            icon: Image.asset(
+              'assets/images/Twitter.png',
+              height: 24,
+            ),
+            onPressed: () async {
+              dynamic result = await _auth.signInWithTwitter();
+            },
+          ),
+        ),
+        Card(
+          child: IconButton(
+            icon: Image.asset(
+              'assets/images/Apple.png',
+              height: 24,
+            ),
+            onPressed: () async {
+              dynamic result = _auth.signInWithApple();
+            },
+          ),
+        ),
+      ],
     );
   }
 }
