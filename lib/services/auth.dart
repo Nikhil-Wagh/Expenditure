@@ -1,5 +1,6 @@
 import 'package:expenditure/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter_twitter_login/flutter_twitter_login.dart';
 // import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -81,7 +82,17 @@ class AuthService {
   }
 
   Future signInWithTwitter() async {
-    final TwitterLogin twitterLogin = TwitterLogin(consumerKey: "b1VsNeN5razVtcveGi9ZjSkLP", consumerSecret: "neAPEHTmAjUIYkRWh0Mc038gLUYuzzg0BkfnpQ3JQUTphjC7Xx");
+    RemoteConfig remoteConfig = await RemoteConfig.instance;
+    await remoteConfig.fetch(expiration: Duration(hours: 1));
+    await remoteConfig.activateFetched();
+
+    String twitterConsumerKey = remoteConfig.getValue('twitter_consumer_key').asString();
+    String twitterConsumerSecret = remoteConfig.getValue('twitter_consumer_secret').asString();
+
+    final TwitterLogin twitterLogin = TwitterLogin(
+      consumerKey: twitterConsumerKey,
+      consumerSecret: twitterConsumerSecret,
+    );
     final TwitterLoginResult result = await twitterLogin.authorize();
     final TwitterSession twitterSession = result.session;
     final auth.AuthCredential twitterAuthCredential = auth.TwitterAuthProvider.credential(accessToken: twitterSession.token, secret: twitterSession.secret);
