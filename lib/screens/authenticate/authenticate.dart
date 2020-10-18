@@ -1,8 +1,10 @@
-import 'dart:async';
+import 'dart:ui';
 
 import 'package:expenditure/constants.dart';
+import 'package:expenditure/screens/loaders/loading_auth.dart';
 import 'package:expenditure/services/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class Authenticate extends StatefulWidget {
   @override
@@ -25,8 +27,7 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
   String confirmPassword = '';
   String error = '';
 
-  String passwordError = null;
-  String emailError = null;
+  bool loading = false;
 
   @override
   void initState() {
@@ -50,6 +51,10 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
           children: [
             _buildConstWelcomeComponent(),
             _buildTabBarView(),
+            Visibility(
+              visible: loading,
+              child: LoadingAuth(),
+            ),
           ],
         ),
       ),
@@ -118,7 +123,6 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
           ],
         ),
       ),
-      // color: Colors.red,
     );
   }
 
@@ -193,12 +197,14 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
             ),
             onPressed: () async {
               if (_SignInFormKey.currentState.validate()) {
+                setState(() => loading = true);
                 dynamic result = await _auth.signInEmailAndPassword(email, password);
                 if (result.hasErrors()) {
                   setState(() {
                     error = result.errorMessage();
                   });
                 }
+                setState(() => loading = false);
               }
             },
           ),
@@ -242,12 +248,14 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
             ),
             onPressed: () async {
               if (_SignUpFormKey.currentState.validate()) {
+                setState(() => loading = true);
                 dynamic result = await _auth.signUpEmailAndPassword(email, password);
                 if (result.hasErrors()) {
                   setState(() {
                     error = result.errorMessage();
                   });
                 }
+                setState(() => loading = true);
               }
             },
           ),
@@ -314,6 +322,9 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
             ),
             onPressed: () async {
               dynamic result = await _auth.signInWithGoogle();
+              if (result.hasErrors()) {
+                error = result.errorMessage();
+              }
             },
           ),
         ),
@@ -325,6 +336,9 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
             ),
             onPressed: () async {
               dynamic result = await _auth.signInWithFacebook();
+              if (result.hasErrors()) {
+                error = result.errorMessage();
+              }
             },
           ),
         ),
@@ -336,20 +350,12 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
             ),
             onPressed: () async {
               dynamic result = await _auth.signInWithTwitter();
+              if (result.hasErrors()) {
+                error = result.errorMessage();
+              }
             },
           ),
         ),
-        // Card(
-        //   child: IconButton(
-        //     icon: Image.asset(
-        //       'assets/images/Apple.png',
-        //       height: 24,
-        //     ),
-        //     onPressed: () async {
-        //       dynamic result = _auth.signInWithApple();
-        //     },
-        //   ),
-        // ),
       ],
     );
   }
