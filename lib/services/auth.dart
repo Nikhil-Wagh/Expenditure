@@ -84,14 +84,6 @@ class AuthService {
 
     auth.UserCredential userCredential = await _firebaseAuth.signInWithCredential(facebookAuthCredential);
     return AuthResult(user: _userFromFirebaseUser(userCredential.user));
-
-    // -------------------------------------------------------------------------
-
-    // final LoginResult result = await FacebookAuth.instance.login();
-    // final auth.FacebookAuthCredential facebookAuthCredential = auth.FacebookAuthProvider.credential(result.accessToken.token);
-
-    // auth.UserCredential userCredential = await _firebaseAuth.signInWithCredential(facebookAuthCredential);
-    // return AuthResult(user: _userFromFirebaseUser(userCredential.user));
   }
 
   Future signInWithTwitter() async {
