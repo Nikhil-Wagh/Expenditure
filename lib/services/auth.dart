@@ -1,6 +1,8 @@
 import 'package:expenditure/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:flutter_twitter_login/flutter_twitter_login.dart';
 // import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -74,6 +76,17 @@ class AuthService {
 
   Future signInWithFacebook() async {
     print("AuthService.signInWithFacebook()");
+    final FacebookLogin facebookLogin = FacebookLogin();
+    final FacebookLoginResult result = await facebookLogin.logIn([
+      'email'
+    ]);
+    auth.FacebookAuthCredential facebookAuthCredential = auth.FacebookAuthProvider.credential(result.accessToken.token);
+
+    auth.UserCredential userCredential = await _firebaseAuth.signInWithCredential(facebookAuthCredential);
+    return AuthResult(user: _userFromFirebaseUser(userCredential.user));
+
+    // -------------------------------------------------------------------------
+
     // final LoginResult result = await FacebookAuth.instance.login();
     // final auth.FacebookAuthCredential facebookAuthCredential = auth.FacebookAuthProvider.credential(result.accessToken.token);
 
