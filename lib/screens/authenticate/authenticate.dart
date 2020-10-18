@@ -339,17 +339,17 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
             },
           ),
         ),
-        Card(
-          child: IconButton(
-            icon: Image.asset(
-              'assets/images/Apple.png',
-              height: 24,
-            ),
-            onPressed: () async {
-              dynamic result = _auth.signInWithApple();
-            },
-          ),
-        ),
+        // Card(
+        //   child: IconButton(
+        //     icon: Image.asset(
+        //       'assets/images/Apple.png',
+        //       height: 24,
+        //     ),
+        //     onPressed: () async {
+        //       dynamic result = _auth.signInWithApple();
+        //     },
+        //   ),
+        // ),
       ],
     );
   }
