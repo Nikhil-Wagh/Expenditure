@@ -21,6 +21,7 @@ class AuthService {
       email: firebaseUser.email,
       displayName: firebaseUser.displayName,
       phoneNumber: firebaseUser.phoneNumber,
+      photoURL: firebaseUser.photoURL,
     );
   }
 
