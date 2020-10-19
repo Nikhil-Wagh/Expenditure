@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'home_screen_app_bar.dart';
+import 'monthly_overview.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -44,6 +45,7 @@ class _HomeState extends State<Home> {
               child: Column(
                 children: [
                   HomeScreenAppBar(user: user),
+                  MonthlyOverview(),
                 ],
               ),
             ),
