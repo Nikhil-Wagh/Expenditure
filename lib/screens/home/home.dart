@@ -1,8 +1,10 @@
-import 'dart:io';
-
+import 'package:expenditure/constants.dart';
+import 'package:expenditure/models/user.dart' as mUser;
 import 'package:expenditure/services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import 'home_screen_app_bar.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -12,49 +14,42 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   AuthService auth = AuthService();
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-  User user;
+  mUser.User user;
 
   @override
   void initState() {
-    // TODO: implement initState
-    user = FirebaseAuth.instance.currentUser;
-    print("User = ${user}");
-    print("displayname = ${user.displayName}");
+    user = auth.userFromFirebaseUser(firebaseAuth.currentUser);
     assert(user != null);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: ClipRRect(
-            borderRadius: BorderRadius.all(Radius.circular(14.0)),
-            child: CircleAvatar(
-              radius: 30.0,
-              backgroundColor: Colors.transparent,
-              child: Image(
-                image: NetworkImage(user.photoURL),
+    return SafeArea(
+      child: Scaffold(
+        body: Center(
+          child: Container(
+            // Use this for gradient if it looks good
+            // decoration: BoxDecoration(
+            //   gradient: LinearGradient(
+            //     begin: Alignment.topLeft,
+            //     end: Alignment.bottomRight,
+            //     colors: [
+            //       primaryAccentColor[100],
+            //       primaryColor[100],
+            //     ],
+            //   ),
+            // ),
+            child: Center(
+              child: Column(
+                children: [
+                  HomeScreenAppBar(user: user),
+                ],
               ),
             ),
           ),
         ),
-        title: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              user.displayName,
-              style: TextStyle(
-                color: Colors.white,
-              ),
-            ),
-            Text("Hello"),
-          ],
-        ),
+        backgroundColor: Colors.white,
       ),
     );
   }

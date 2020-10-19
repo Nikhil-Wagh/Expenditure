@@ -14,7 +14,7 @@ class AuthService {
 
   final auth.FirebaseAuth _firebaseAuth = auth.FirebaseAuth.instance;
 
-  User _userFromFirebaseUser(auth.User firebaseUser) {
+  User userFromFirebaseUser(auth.User firebaseUser) {
     if (firebaseUser == null) return null;
     return User(
       uid: firebaseUser.uid,
@@ -26,13 +26,13 @@ class AuthService {
   }
 
   Stream<User> get user {
-    return _firebaseAuth.authStateChanges().map(_userFromFirebaseUser);
+    return _firebaseAuth.authStateChanges().map(userFromFirebaseUser);
   }
 
   Future signUpEmailAndPassword(String email, String password) async {
     try {
       auth.UserCredential userCredential = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
-      return AuthResult(user: _userFromFirebaseUser(userCredential.user));
+      return AuthResult(user: userFromFirebaseUser(userCredential.user));
     } on auth.FirebaseAuthException catch (e) {
       print('[ERROR] signUpEmailAndPassword(): error = ' + e.toString());
 
@@ -48,7 +48,7 @@ class AuthService {
   Future signInEmailAndPassword(String email, password) async {
     try {
       auth.UserCredential userCredential = await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
-      return AuthResult(user: _userFromFirebaseUser(userCredential.user));
+      return AuthResult(user: userFromFirebaseUser(userCredential.user));
     } on auth.FirebaseAuthException catch (e) {
       print('[ERROR] signInEmailAndPassword(): error = ' + e.toString());
 
@@ -70,7 +70,7 @@ class AuthService {
     );
 
     auth.UserCredential userCredential = await _firebaseAuth.signInWithCredential(googleAuthCredential);
-    return AuthResult(user: _userFromFirebaseUser(userCredential.user));
+    return AuthResult(user: userFromFirebaseUser(userCredential.user));
   }
 
   Future signInWithFacebook() async {
@@ -82,7 +82,7 @@ class AuthService {
     auth.FacebookAuthCredential facebookAuthCredential = auth.FacebookAuthProvider.credential(result.accessToken.token);
 
     auth.UserCredential userCredential = await _firebaseAuth.signInWithCredential(facebookAuthCredential);
-    return AuthResult(user: _userFromFirebaseUser(userCredential.user));
+    return AuthResult(user: userFromFirebaseUser(userCredential.user));
   }
 
   Future signInWithTwitter() async {
@@ -101,7 +101,7 @@ class AuthService {
     final TwitterSession twitterSession = result.session;
     final auth.AuthCredential twitterAuthCredential = auth.TwitterAuthProvider.credential(accessToken: twitterSession.token, secret: twitterSession.secret);
     auth.UserCredential userCredential = await _firebaseAuth.signInWithCredential(twitterAuthCredential);
-    return _userFromFirebaseUser(userCredential.user);
+    return userFromFirebaseUser(userCredential.user);
   }
 
   Future signInWithApple() async {}
