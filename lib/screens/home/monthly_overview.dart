@@ -30,24 +30,35 @@ class _MonthlyOverviewState extends State<MonthlyOverview> {
         margin: EdgeInsets.all(mMargin + 10),
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            Stack(
               children: [
-                Icon(Icons.chevron_left, color: Colors.white),
-                SizedBox(width: 10),
-                Text(
-                  "Jan, 2020",
-                  style: TextStyle(
-                    fontSize: 24,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.chevron_left, color: Colors.white),
+                    SizedBox(width: 10),
+                    Text(
+                      "Jan 2020",
+                      style: TextStyle(
+                        fontSize: 24,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Icon(Icons.chevron_right, color: Colors.white),
+                  ],
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Icon(
+                    Icons.calendar_today,
                     color: Colors.white,
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(width: 10),
-                Icon(Icons.chevron_right, color: Colors.white),
               ],
             ),
-            SizedBox(height: 32),
+            SizedBox(height: 22),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -65,22 +76,50 @@ class _MonthlyOverviewState extends State<MonthlyOverview> {
                 ),
               ],
             ),
-            SizedBox(height: 30),
-            Stack(
-              alignment: Alignment.center,
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                LinearProgressIndicator(
-                  value: 0.7,
-                  backgroundColor: Colors.white,
-                  // valueColor: Animation<Color>(),
-                  minHeight: 16,
+                Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    color: Color.alphaBlend(primaryColor, Colors.black),
+                  ),
+                  child: Text(
+                    "Income",
+                    style: TextStyle(color: Colors.greenAccent),
+                  ),
                 ),
-                Text(
-                  "70%",
-                  style: TextStyle(fontSize: 16, color: Colors.purple),
+                SizedBox(width: 8),
+                Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    color: Color.alphaBlend(primaryColor, Colors.black),
+                  ),
+                  child: Text(
+                    "Remaining",
+                    style: TextStyle(color: Colors.redAccent),
+                  ),
                 ),
               ],
-            ),
+            )
+            // Stack(
+            //   alignment: Alignment.center,
+            //   children: [
+            //     LinearProgressIndicator(
+            //       value: 0.7,
+            //       backgroundColor: Colors.white,
+            //       // valueColor: Animation<Color>(),
+            //       minHeight: 16,
+            //     ),
+            //     Text(
+            //       "70%",
+            //       style: TextStyle(fontSize: 16, color: Colors.purple),
+            //     ),
+            //   ],
+            // ),
           ],
         ),
       ),

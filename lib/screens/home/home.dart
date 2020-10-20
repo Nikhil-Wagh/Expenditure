@@ -1,5 +1,6 @@
 import 'package:expenditure/constants.dart';
 import 'package:expenditure/models/user.dart' as mUser;
+import 'package:expenditure/screens/home/recent_transactions.dart';
 import 'package:expenditure/services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +31,7 @@ class _HomeState extends State<Home> {
       child: Scaffold(
         body: Center(
           child: Container(
+            margin: EdgeInsets.all(mMargin),
             // Use this for gradient if it looks good
             // decoration: BoxDecoration(
             //   gradient: LinearGradient(
@@ -43,9 +45,11 @@ class _HomeState extends State<Home> {
             // ),
             child: Center(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   HomeScreenAppBar(user: user),
                   MonthlyOverview(),
+                  RecentTransactions(),
                 ],
               ),
             ),
