@@ -7,119 +7,139 @@ class MonthlyOverview extends StatefulWidget {
 }
 
 class _MonthlyOverviewState extends State<MonthlyOverview> {
+  Color fontColor = Colors.white;
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 200,
       width: MediaQuery.of(context).size.width,
       margin: EdgeInsets.all(mMargin),
       decoration: BoxDecoration(
         backgroundBlendMode: BlendMode.darken,
         borderRadius: BorderRadius.all(Radius.circular(20)),
         gradient: LinearGradient(
+          tileMode: TileMode.repeated,
+          // transform: ,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
+          // transform: GradientTransform(),
           colors: [
-            primaryAccentColor,
-            primaryColor,
+            // Colors.orange, // Accents with purple
+            Colors.purple[900], // Accents with greens
+            Colors.indigo, // Accents with red
           ],
         ),
         color: primaryColor,
       ),
       child: Container(
-        margin: EdgeInsets.all(mMargin + 10),
+        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 30),
         child: Column(
           children: [
-            Stack(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.chevron_left, color: Colors.white),
-                    SizedBox(width: 10),
-                    Text(
-                      "Jan 2020",
-                      style: TextStyle(
-                        fontSize: 24,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(width: 10),
-                    Icon(Icons.chevron_right, color: Colors.white),
-                  ],
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Icon(
-                    Icons.calendar_today,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 22),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 3),
-                  child: Text(
-                    "Expenses",
-                    style: TextStyle(fontSize: 20, color: Colors.black),
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Balance",
+                      style: TextStyle(
+                        color: Colors.yellow,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      "Rs 1,00,000.00",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: fontColor,
+                        fontSize: 20,
+                      ),
+                    )
+                  ],
                 ),
-                Text(
-                  "Rs 32,000.00",
-                  style: TextStyle(fontSize: 32, color: Colors.white),
+                Padding(
+                  padding: const EdgeInsets.all(2.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        "Jan 2020",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: fontColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Icon(
+                          Icons.calendar_today,
+                          color: Colors.white,
+                          size: 40,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 0),
+            Divider(
+              height: 40,
+              thickness: 1,
+              color: Colors.grey,
+            ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                    color: Color.alphaBlend(primaryColor, Colors.black),
-                  ),
-                  child: Text(
-                    "Income",
-                    style: TextStyle(color: Colors.greenAccent),
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Income",
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      "Rs 1,10,000.000",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: fontColor,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(width: 8),
-                Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                    color: Color.alphaBlend(primaryColor, Colors.black),
-                  ),
-                  child: Text(
-                    "Remaining",
-                    style: TextStyle(color: Colors.redAccent),
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Expenses",
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      "Rs 10,000.00",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: fontColor,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ],
                 ),
               ],
-            )
-            // Stack(
-            //   alignment: Alignment.center,
-            //   children: [
-            //     LinearProgressIndicator(
-            //       value: 0.7,
-            //       backgroundColor: Colors.white,
-            //       // valueColor: Animation<Color>(),
-            //       minHeight: 16,
-            //     ),
-            //     Text(
-            //       "70%",
-            //       style: TextStyle(fontSize: 16, color: Colors.purple),
-            //     ),
-            //   ],
-            // ),
+            ),
           ],
         ),
       ),
