@@ -2,7 +2,7 @@ import 'package:expenditure/models/user.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreenAppBar extends StatelessWidget {
-  User user;
+  final User user;
   HomeScreenAppBar({this.user});
 
   @override

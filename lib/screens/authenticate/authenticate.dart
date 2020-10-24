@@ -4,7 +4,6 @@ import 'package:expenditure/constants.dart';
 import 'package:expenditure/screens/loaders/loading_auth.dart';
 import 'package:expenditure/services/auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class Authenticate extends StatefulWidget {
   @override
@@ -19,8 +18,8 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
   TabController _tabController;
 
   final AuthService _auth = AuthService();
-  final _SignInFormKey = GlobalKey<FormState>();
-  final _SignUpFormKey = GlobalKey<FormState>();
+  final _signInFormKey = GlobalKey<FormState>();
+  final _signUpFormKey = GlobalKey<FormState>();
 
   String email = '';
   String password = '';
@@ -166,7 +165,7 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
 
   Form _signInForm() {
     return Form(
-      key: _SignInFormKey,
+      key: _signInFormKey,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         verticalDirection: VerticalDirection.down,
@@ -196,7 +195,7 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
               style: TextStyle(color: Colors.white),
             ),
             onPressed: () async {
-              if (_SignInFormKey.currentState.validate()) {
+              if (_signInFormKey.currentState.validate()) {
                 setState(() => loading = true);
                 dynamic result = await _auth.signInEmailAndPassword(email, password);
                 if (result.hasErrors()) {
@@ -216,7 +215,7 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
 
   Form _signUpForm() {
     return Form(
-      key: _SignUpFormKey,
+      key: _signUpFormKey,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         verticalDirection: VerticalDirection.down,
@@ -247,7 +246,7 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
               style: TextStyle(color: Colors.white),
             ),
             onPressed: () async {
-              if (_SignUpFormKey.currentState.validate()) {
+              if (_signUpFormKey.currentState.validate()) {
                 setState(() => loading = true);
                 dynamic result = await _auth.signUpEmailAndPassword(email, password);
                 if (result.hasErrors()) {
