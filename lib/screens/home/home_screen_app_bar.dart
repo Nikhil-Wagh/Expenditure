@@ -1,9 +1,9 @@
-import 'package:expenditure/models/user.dart';
+import 'package:expenditure/services/auth.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreenAppBar extends StatelessWidget {
-  final User user;
-  HomeScreenAppBar({this.user});
+  String displayName, photoURL;
+  HomeScreenAppBar({this.displayName, this.photoURL});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,7 @@ class HomeScreenAppBar extends StatelessWidget {
             child: CircleAvatar(
               maxRadius: 24,
               child: Image(
-                image: NetworkImage(user.photoURL),
+                image: NetworkImage(photoURL),
               ),
             ),
           ),
@@ -36,7 +36,7 @@ class HomeScreenAppBar extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  user.displayName,
+                  displayName,
                   style: TextStyle(fontSize: 24, color: Colors.black, fontWeight: FontWeight.bold),
                 )
               ],
@@ -46,13 +46,42 @@ class HomeScreenAppBar extends StatelessWidget {
             Icons.notifications_none,
             size: 38,
           ),
-          Icon(
-            Icons.more_vert,
-            size: 40,
-            color: Colors.black,
-          )
+          PopupMenuButton(
+            padding: EdgeInsets.all(0),
+            icon: Icon(
+              Icons.more_vert,
+              size: 38,
+              color: Colors.black,
+            ),
+            onSelected: (value) => choicesAction(value),
+            itemBuilder: (context) {
+              return [
+                PopupMenuItem<String>(
+                  value: "Logout",
+                  child: Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Icon(Icons.exit_to_app),
+                        SizedBox(width: 10),
+                        Text("Sign out")
+                      ],
+                    ),
+                  ),
+                )
+              ];
+            },
+            // onSelected: ,
+          ),
         ],
       ),
     );
+  }
+
+  choicesAction(value) {
+    switch (value) {
+      case "Logout":
+        AuthService().signOut();
+    }
   }
 }

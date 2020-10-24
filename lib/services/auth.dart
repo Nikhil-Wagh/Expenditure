@@ -1,4 +1,5 @@
 import 'package:expenditure/models/user.dart';
+import 'package:expenditure/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
@@ -16,6 +17,8 @@ class AuthService {
 
   User userFromFirebaseUser(auth.User firebaseUser) {
     if (firebaseUser == null) return null;
+    // firebaseUser.providerData;
+    print("[debug] AuthService firebase user = $firebaseUser");
     return User(
       uid: firebaseUser.uid,
       email: firebaseUser.email,
@@ -70,7 +73,10 @@ class AuthService {
     );
 
     auth.UserCredential userCredential = await _firebaseAuth.signInWithCredential(googleAuthCredential);
-    return AuthResult(user: userFromFirebaseUser(userCredential.user));
+    auth.User firebaseUser = userCredential.user;
+    User user = userFromFirebaseUser(firebaseUser);
+    DatabaseService(uid: user.uid).updateUserData(user);
+    return AuthResult(user: user);
   }
 
   Future signInWithFacebook() async {

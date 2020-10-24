@@ -15,3 +15,6 @@ const mUnselectedTextColor = Colors.grey;
 // Dimensions
 const mPadding = 8.0;
 const mMargin = 8.0;
+
+const USERS_COLLECTION = 'users';
+const EXPENDITURES_COLLECTION = 'expenditures';
