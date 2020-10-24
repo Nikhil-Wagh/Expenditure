@@ -45,3 +45,6 @@ android/app/google-services.json
 
 # Exceptions to above rules.
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+
+# firestore rules
+firestore.rules
