@@ -62,9 +62,17 @@ class ListItemExpenditure extends StatelessWidget {
                 ),
               ],
             ),
+            SizedBox(height: 8),
             Row(
               children: [
-                Text(expenditure.timestamp.toString()),
+                Text(
+                  expenditure.timestampToString(),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontStyle: FontStyle.italic,
+                    fontSize: 12,
+                  ),
+                ),
               ],
             ),
           ],

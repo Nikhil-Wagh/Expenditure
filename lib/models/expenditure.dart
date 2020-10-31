@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:expenditure/utils.dart';
+import 'package:intl/intl.dart';
 
 class Expenditure {
   Amount amount;
@@ -13,6 +13,10 @@ class Expenditure {
     if (this.timestamp == null) {
       this.timestamp = Timestamp.now();
     }
+  }
+
+  String timestampToString() {
+    return DateFormat.MMMd().addPattern(', ').add_jm().format(timestamp.toDate());
   }
 }
 
