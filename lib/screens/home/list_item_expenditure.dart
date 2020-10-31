@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:expenditure/constants.dart';
+import 'package:expenditure/main.dart';
 import 'package:expenditure/models/expenditure.dart';
 import 'package:flutter/material.dart';
 import 'package:expenditure/utils.dart';
@@ -25,6 +26,11 @@ class ListItemExpenditure extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Icon(
+                  Icons.shopping_cart,
+                  color: Colors.white,
+                ),
+                SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     expenditure.description,
@@ -64,6 +70,7 @@ class ListItemExpenditure extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
                   expenditure.timestampToString(),
