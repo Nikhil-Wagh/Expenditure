@@ -1,29 +1,18 @@
 import 'package:expenditure/constants.dart';
+import 'package:expenditure/models/expenditure.dart';
 import 'package:expenditure/models/user.dart' as mUser;
 import 'package:expenditure/screens/home/recent_expenditures.dart';
 import 'package:expenditure/services/auth.dart';
+import 'package:expenditure/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'home_screen_app_bar.dart';
 import 'monthly_overview.dart';
 
-class Home extends StatefulWidget {
-  @override
-  _HomeState createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  AuthService auth = AuthService();
-  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-  mUser.User user;
-
-  @override
-  void initState() {
-    user = auth.userFromFirebaseUser(firebaseAuth.currentUser);
-    assert(user != null);
-    super.initState();
-  }
+class Home extends StatelessWidget {
+  final mUser.User user;
+  Home({this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -33,17 +22,6 @@ class _HomeState extends State<Home> {
         body: Center(
           child: Container(
             margin: EdgeInsets.all(mMargin),
-            // Use this for gradient if it looks good
-            // decoration: BoxDecoration(
-            //   gradient: LinearGradient(
-            //     begin: Alignment.topLeft,
-            //     end: Alignment.bottomRight,
-            //     colors: [
-            //       primaryAccentColor[100],
-            //       primaryColor[100],
-            //     ],
-            //   ),
-            // ),
             child: Center(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,3 +42,15 @@ class _HomeState extends State<Home> {
     );
   }
 }
+
+// Use this for gradient if it looks good
+// decoration: BoxDecoration(
+//   gradient: LinearGradient(
+//     begin: Alignment.topLeft,
+//     end: Alignment.bottomRight,
+//     colors: [
+//       primaryAccentColor[100],
+//       primaryColor[100],
+//     ],
+//   ),
+// ),

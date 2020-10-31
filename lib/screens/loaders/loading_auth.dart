@@ -8,10 +8,6 @@ class LoadingAuth extends StatelessWidget {
   @override
   Widget build(BuildContext contexts) {
     return Positioned(
-      top: 00,
-      bottom: 00,
-      right: 00,
-      left: 00,
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
         child: Container(

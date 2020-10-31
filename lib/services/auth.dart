@@ -19,11 +19,24 @@ class AuthService {
     if (firebaseUser == null) return null;
     // firebaseUser.providerData;
     print("[debug] AuthService firebase user = $firebaseUser");
+    String email = firebaseUser.email, phoneNumber = firebaseUser.phoneNumber;
+
+    if (email == null) {
+      if (firebaseUser.providerData.length > 0 && firebaseUser.providerData.first != null) {
+        email = firebaseUser.providerData.first.email;
+      }
+    }
+
+    if (firebaseUser.phoneNumber == null) {
+      if (firebaseUser.providerData.length > 0 && firebaseUser.providerData.first != null) {
+        phoneNumber = firebaseUser.providerData.first.phoneNumber;
+      }
+    }
     return User(
       uid: firebaseUser.uid,
-      email: firebaseUser.email,
+      email: email,
       displayName: firebaseUser.displayName,
-      phoneNumber: firebaseUser.phoneNumber,
+      phoneNumber: phoneNumber,
       photoURL: firebaseUser.photoURL,
     );
   }

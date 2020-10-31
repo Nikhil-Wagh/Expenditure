@@ -4,30 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'list_expenditures.dart';
 
-class RecentExpenditures extends StatefulWidget {
+class RecentExpenditures extends StatelessWidget {
   final String uid;
   RecentExpenditures({this.uid});
 
   @override
-  _RecentExpendituresState createState() => _RecentExpendituresState(this.uid);
-}
-
-class _RecentExpendituresState extends State<RecentExpenditures> {
-  String uid;
-  _RecentExpendituresState(String uid) {
-    this.uid = uid;
-  }
-
-  @override
   Widget build(BuildContext context) {
-    print("[info]Getting snapshot");
-    print("[debug] RecentExpenditureState.uid = $uid");
-    // DatabaseService(uid: uid).getUserSnapshot();
-
-    return Container(
+    print('[debug] RecentExpendituresState.build.uid = $uid');
+    return StreamProvider<QuerySnapshot>(
+      create: (context) {
+        return DatabaseService(uid: uid).expenditures;
+      },
+      lazy: false,
+      child: Container(
         padding: EdgeInsets.all(16),
-        width: MediaQuery.of(context).size.width,
-        // color: Colors.blue,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
@@ -40,11 +30,10 @@ class _RecentExpendituresState extends State<RecentExpenditures> {
                   ),
             ),
             SizedBox(height: 10),
-            StreamProvider<QuerySnapshot>.value(
-              value: DatabaseService(uid: uid).expenditures,
-              child: ListExpenditures(),
-            ),
+            ListExpenditures(),
           ],
-        ));
+        ),
+      ),
+    );
   }
 }
