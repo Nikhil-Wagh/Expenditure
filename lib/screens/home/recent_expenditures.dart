@@ -13,15 +13,6 @@ class RecentExpenditures extends StatefulWidget {
 }
 
 class _RecentExpendituresState extends State<RecentExpenditures> {
-  List<Text> _sampleList = <Text>[
-    Text("Hello World"),
-    Text("Jurrasic Park"),
-    Text("Hello World"),
-    Text("Jurrasic Park"),
-    Text("Hello World"),
-    Text("Jurrasic Park"),
-  ];
-
   String uid;
   _RecentExpendituresState(String uid) {
     this.uid = uid;
@@ -31,7 +22,7 @@ class _RecentExpendituresState extends State<RecentExpenditures> {
   Widget build(BuildContext context) {
     print("[info]Getting snapshot");
     print("[debug] RecentExpenditureState.uid = $uid");
-    DatabaseService(uid: uid).getUserSnapshot();
+    // DatabaseService(uid: uid).getUserSnapshot();
 
     return Container(
         padding: EdgeInsets.all(16),
