@@ -13,7 +13,7 @@ class RecentExpenditures extends StatelessWidget {
     print('[debug] RecentExpendituresState.build.uid = $uid');
     return StreamProvider<QuerySnapshot>(
       create: (context) {
-        return DatabaseService(uid: uid).expenditures;
+        return DatabaseService().expenditures;
       },
       lazy: false,
       child: Container(

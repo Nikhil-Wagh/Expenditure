@@ -88,7 +88,7 @@ class AuthService {
     auth.UserCredential userCredential = await _firebaseAuth.signInWithCredential(googleAuthCredential);
     auth.User firebaseUser = userCredential.user;
     User user = userFromFirebaseUser(firebaseUser);
-    DatabaseService(uid: user.uid).updateUserData(user);
+    DatabaseService().updateUserData(user);
     return AuthResult(user: user);
   }
 
@@ -127,6 +127,14 @@ class AuthService {
 
   signOut() {
     _firebaseAuth.signOut();
+  }
+
+  User currentUser() {
+    if (_firebaseAuth.currentUser != null) {
+      return userFromFirebaseUser(_firebaseAuth.currentUser);
+    }
+    // TODO: Default values for user model
+    return User();
   }
 
   validateEmail(String email) {
