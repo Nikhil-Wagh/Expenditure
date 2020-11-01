@@ -1,10 +1,9 @@
 // Usefull common functions or classes
 // For eg: PaddedTextView
-import 'package:flutter/material.dart';
 import 'package:intl/number_symbols_data.dart';
 import 'package:intl/intl.dart';
 
-class Util {
+class Utils {
   static NumberFormat getCurrency() {
     // return
 
@@ -17,5 +16,13 @@ class Util {
     // return NumberFormat.getCurrencyInstance(new Locale("en", "in"));
     return numberFormatSymbols['in'].CURRENCY_PATTERN;
     // Localizations.localeOf(context).toString();
+  }
+
+  static String getMonthlyOverviewDocName(int month, int year) {
+    return DateFormat('M_y').format(DateTime(year, month));
+  }
+
+  static String getMonthYear(int month, int year) {
+    return DateFormat.yMMM().format(DateTime(year, month));
   }
 }
