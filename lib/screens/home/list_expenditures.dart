@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expenditure/screens/home/list_item_expenditure.dart';
-import 'package:expenditure/screens/loaders/loading_auth.dart';
 import 'package:expenditure/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
