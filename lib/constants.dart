@@ -5,6 +5,9 @@ const welcome = "Welcome";
 const helloString = "Hello";
 const createAccountString = "Log into your Expenditure account to analyze your spending, create a monthly budget and save more money";
 const motoString = "A penny saved is a penny earned";
+const incomeString = "Income";
+const balanceString = "Balance";
+const expensesString = "Expenses";
 
 // Colors
 const primaryColor = Colors.orange;
@@ -18,3 +21,4 @@ const mMargin = 8.0;
 
 const USERS_COLLECTION = 'users';
 const EXPENDITURES_COLLECTION = 'expenditures';
+const MONTHLY_OVERVIEW_COLLECTION = 'monthly_overview';

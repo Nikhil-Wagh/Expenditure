@@ -8,7 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'home_screen_app_bar.dart';
-import 'monthly_overview.dart';
+import 'monthly_overview_holder.dart';
 
 class Home extends StatelessWidget {
   final mUser.User user;
@@ -30,7 +30,7 @@ class Home extends StatelessWidget {
                     displayName: user.displayName,
                     photoURL: user.photoURL,
                   ),
-                  MonthlyOverview(),
+                  MonthlyOverviewHolder(),
                   RecentExpenditures(uid: user.uid),
                 ],
               ),
