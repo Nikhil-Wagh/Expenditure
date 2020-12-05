@@ -16,31 +16,27 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print("[debug] _HomeState.user.uid = ${user.uid}");
-    return SafeArea(
-      child: Scaffold(
-        body: Center(
-          child: Container(
-            margin: EdgeInsets.all(mMargin),
-            child: Center(
-              child: StreamProvider<List<Expenditure>>.value(
-                value: DatabaseService().expenditures(),
-                child: Column(
-                  children: [
-                    HomeScreenAppBar(
-                      displayName: user.displayName,
-                      photoURL: user.photoURL,
-                    ),
-                    HomeScreenBody(),
-                    // MonthlyOverviewHolder(),
-                    // RecentExpenditures(uid: user.uid),
-                  ],
+    return Scaffold(
+      body: Container(
+        margin: EdgeInsets.all(mMargin),
+        child: Center(
+          child: StreamProvider<List<Expenditure>>.value(
+            value: DatabaseService().expenditures(),
+            child: Column(
+              children: [
+                HomeScreenAppBar(
+                  displayName: user.displayName,
+                  photoURL: user.photoURL,
                 ),
-              ),
+                HomeScreenBody(),
+                // MonthlyOverviewHolder(),
+                // RecentExpenditures(uid: user.uid),
+              ],
             ),
           ),
         ),
-        backgroundColor: Colors.white,
       ),
+      backgroundColor: Colors.white,
     );
   }
 }

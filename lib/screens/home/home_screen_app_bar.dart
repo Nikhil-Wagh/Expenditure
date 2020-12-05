@@ -13,7 +13,7 @@ class HomeScreenAppBar extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.all(
-              Radius.circular(16.0),
+              Radius.circular(10.0),
             ),
             child: CircleAvatar(
               maxRadius: 24,

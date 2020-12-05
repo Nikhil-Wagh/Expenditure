@@ -9,18 +9,19 @@ class RecentExpenditures extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16),
-      child: SingleChildScrollView(
-        physics: ScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            _RecentExpendituresHeader(),
-            SizedBox(height: 10),
-            _ListExpenditures(selectedIndex: selectedExpenditureIndex),
-          ],
+      child: Expanded(
+        child: Container(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              _RecentExpendituresHeader(),
+              SizedBox(height: 10),
+              _ListExpenditures(selectedIndex: selectedExpenditureIndex),
+            ],
+          ),
         ),
       ),
     );
@@ -50,29 +51,36 @@ class _ListExpendituresState extends State<_ListExpenditures> {
     print('[debug] _ListExpenditureState.build'
         '.selectedIndex = ${widget.selectedIndex}');
 
-    return NotificationListener<ExpenditureSelectedNotification>(
-      child: ListView.builder(
-        shrinkWrap: true,
-        itemCount: expenditures.length,
-        itemBuilder: (context, index) {
-          print('[info] _ListExpendituresState.ListView'
-              '.builder.itemBuilder called on index = $index');
+    return Expanded(
+      child: Container(
+        child: NotificationListener<ExpenditureSelectedNotification>(
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: expenditures.length,
+            itemBuilder: (context, index) {
+              print('[info] _ListExpendituresState.ListView'
+                  '.builder.itemBuilder called on index = $index');
 
-          return _ListItemExpenditure(
-            id: index,
-            expenditure: expenditures[index],
-            selected: index == widget.selectedIndex,
-          );
-        },
+              return _ListItemExpenditure(
+                id: index,
+                expenditure: expenditures[index],
+                selected: index == widget.selectedIndex,
+              );
+            },
+            physics: BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
+          ),
+          onNotification: (notification) {
+            debugPrint('[debug] RecentExpenditure.ListExpenditureState '
+                'got notification selectedIndex = ${notification.selectedIndex}');
+            setState(() {
+              widget.selectedIndex = notification.selectedIndex;
+            });
+            return false; // Send up the tree
+          },
+        ),
       ),
-      onNotification: (notification) {
-        debugPrint('[debug] RecentExpenditure.ListExpenditureState '
-            'got notification selectedIndex = ${notification.selectedIndex}');
-        setState(() {
-          widget.selectedIndex = notification.selectedIndex;
-        });
-        return false; // Send up the tree
-      },
     );
   }
 }

@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
                 primarySwatch: primaryColor,
                 visualDensity: VisualDensity.adaptivePlatformDensity,
               ),
-              home: Wrapper(),
+              home: SafeArea(child: Wrapper()),
             ),
           );
         }
