@@ -13,16 +13,17 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: NotificationListener<SelectedNotification>(
+      child: NotificationListener<ExpenditureSelectedNotification>(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // MonthlyOverviewHolder(),
-            RecentExpenditures(),
+            MonthlyOverviewHolder(selectedExpenditureIndex: _selectedExpenditure),
+            RecentExpenditures(selectedExpenditureIndex: _selectedExpenditure),
           ],
         ),
         onNotification: (notification) {
-          print('[debug] HomeScreenBody.selectedNotification catched notification with id = ${notification.selectedIndex}');
+          print('[debug] HomeScreenBody.selectedNotification catched'
+              ' notification with id = ${notification.selectedIndex}');
           if (_selectedExpenditure != notification.selectedIndex) {
             _selectedExpenditure = notification.selectedIndex;
             print('[debug] _selectedExpenditure = $_selectedExpenditure');

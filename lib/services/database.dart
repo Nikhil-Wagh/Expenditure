@@ -59,7 +59,10 @@ class DatabaseService {
           'timestamp',
           isLessThan: Timestamp.fromDate(endDate),
         )
-        .orderBy('timestamp')
+        .orderBy('timestamp', descending: true)
+        // .limit(limit)
+        // TODO: Decide whether we want limit or not
+        // Probably need to do some load testing
         .snapshots()
         .map(_expendituresListFromSnapshots);
   }

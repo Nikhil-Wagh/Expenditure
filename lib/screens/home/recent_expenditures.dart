@@ -3,12 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class RecentExpenditures extends StatelessWidget {
-  final String uid;
-  RecentExpenditures({this.uid});
+  final int selectedExpenditureIndex;
+  RecentExpenditures({@required this.selectedExpenditureIndex});
 
   @override
   Widget build(BuildContext context) {
-    print('[debug] RecentExpendituresState.build.uid = $uid');
     return Container(
       padding: EdgeInsets.all(16),
       child: SingleChildScrollView(
@@ -20,7 +19,7 @@ class RecentExpenditures extends StatelessWidget {
           children: [
             _RecentExpendituresHeader(),
             SizedBox(height: 10),
-            _ListExpenditures(),
+            _ListExpenditures(selectedIndex: selectedExpenditureIndex),
           ],
         ),
       ),
@@ -29,6 +28,9 @@ class RecentExpenditures extends StatelessWidget {
 }
 
 class _ListExpenditures extends StatefulWidget {
+  int selectedIndex;
+  _ListExpenditures({this.selectedIndex});
+
   @override
   _ListExpendituresState createState() => _ListExpendituresState();
 }
@@ -38,19 +40,38 @@ class _ListExpendituresState extends State<_ListExpenditures> {
   Widget build(BuildContext context) {
     List<Expenditure> expenditures = Provider.of<List<Expenditure>>(context);
 
-    print('[debug] _ListExpenditureState.build.expenditures = $expenditures');
-    print('[debug] _ListExpenditureState.build.expenditures.length = ${expenditures.length}');
-
     if (expenditures == null) {
+      // TODO: Showing a loading widget
       return Text("Still Loading .. Please wait");
     }
-    return ListView.builder(
-      shrinkWrap: true,
-      reverse: true, // latest first
-      itemCount: expenditures.length,
-      itemBuilder: (context, index) {
-        print("[info] _ListExpendituresState.ListView.builder.itemBuilder called");
-        return _ListItemExpenditure(id: index, expenditure: expenditures[index]);
+
+    print('[debug] _ListExpenditureState.build'
+        '.expenditures.length = ${expenditures.length}');
+    print('[debug] _ListExpenditureState.build'
+        '.selectedIndex = ${widget.selectedIndex}');
+
+    return NotificationListener<ExpenditureSelectedNotification>(
+      child: ListView.builder(
+        shrinkWrap: true,
+        itemCount: expenditures.length,
+        itemBuilder: (context, index) {
+          print('[info] _ListExpendituresState.ListView'
+              '.builder.itemBuilder called on index = $index');
+
+          return _ListItemExpenditure(
+            id: index,
+            expenditure: expenditures[index],
+            selected: index == widget.selectedIndex,
+          );
+        },
+      ),
+      onNotification: (notification) {
+        debugPrint('[debug] RecentExpenditure.ListExpenditureState '
+            'got notification selectedIndex = ${notification.selectedIndex}');
+        setState(() {
+          widget.selectedIndex = notification.selectedIndex;
+        });
+        return false; // Send up the tree
       },
     );
   }
@@ -59,15 +80,18 @@ class _ListExpendituresState extends State<_ListExpenditures> {
 class _ListItemExpenditure extends StatefulWidget {
   final Expenditure expenditure;
   final int id;
-  _ListItemExpenditure({@required this.id, @required this.expenditure});
+  final bool selected;
+  _ListItemExpenditure({
+    @required this.id,
+    @required this.expenditure,
+    @required this.selected,
+  });
 
   @override
   _ListItemExpenditureState createState() => _ListItemExpenditureState();
 }
 
 class _ListItemExpenditureState extends State<_ListItemExpenditure> {
-  bool selected = false;
-
   @override
   Widget build(BuildContext context) {
     final _cardBorder = RoundedRectangleBorder(
@@ -78,16 +102,14 @@ class _ListItemExpenditureState extends State<_ListItemExpenditure> {
       duration: Duration(milliseconds: 200),
       child: Card(
         shape: _cardBorder,
-        color: (selected == true) ? Colors.indigo : Colors.blue[400],
+        color: (widget.selected == true) ? Colors.indigo : Colors.blue[400],
         child: InkWell(
           customBorder: _cardBorder,
           onTap: () {
             setState(() {
-              selected = true;
-              SelectedNotification(selectedIndex: widget.id);
+              ExpenditureSelectedNotification(selectedIndex: widget.id).dispatch(context);
             });
             print('[info] ListItemExpenditure tapped');
-            print('[debug] ListItemExpenditure.selected = $selected');
           },
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
@@ -178,11 +200,10 @@ class _RecentExpendituresHeader extends StatelessWidget {
   }
 }
 
-class SelectedNotification extends Notification {
+class ExpenditureSelectedNotification extends Notification {
   final int selectedIndex;
 
-  SelectedNotification({this.selectedIndex}) {
+  ExpenditureSelectedNotification({this.selectedIndex}) {
     print('[debug] SelectedNotification generated with index = $selectedIndex');
   }
 }
-

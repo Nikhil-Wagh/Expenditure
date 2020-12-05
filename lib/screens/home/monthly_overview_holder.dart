@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class MonthlyOverviewHolder extends StatefulWidget {
-  final int selectedIndex;
+  final int selectedExpenditureIndex;
 
-  MonthlyOverviewHolder({this.selectedIndex});
+  MonthlyOverviewHolder({@required this.selectedExpenditureIndex});
 
   @override
   _MonthlyOverviewHolderState createState() => _MonthlyOverviewHolderState();
