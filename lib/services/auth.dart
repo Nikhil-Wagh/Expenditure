@@ -7,6 +7,8 @@ import 'package:flutter_twitter_login/flutter_twitter_login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
+  // TODO
+  // Need to handle PlatformExceptions for all Platform Login functions
   /* 
    * Handles all the authentication related functions
    * Including sign in and sign up
