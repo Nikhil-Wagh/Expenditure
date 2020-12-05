@@ -72,8 +72,8 @@ class _ListExpendituresState extends State<_ListExpenditures> {
             ),
           ),
           onNotification: (notification) {
-            debugPrint('[debug] RecentExpenditure.ListExpenditureState '
-                'got notification selectedIndex = ${notification.selectedIndex}');
+            debugPrint('[debug] RecentExpenditure.ListExpenditureState got '
+                'notification selectedIndex = ${notification.selectedIndex}');
             setState(() {
               widget.selectedIndex = notification.selectedIndex;
             });
@@ -115,7 +115,9 @@ class _ListItemExpenditureState extends State<_ListItemExpenditure> {
           customBorder: _cardBorder,
           onTap: () {
             setState(() {
-              ExpenditureSelectedNotification(selectedIndex: widget.id).dispatch(context);
+              ExpenditureSelectedNotification(
+                selectedIndex: widget.id,
+              ).dispatch(context);
             });
             print('[info] ListItemExpenditure tapped');
           },
