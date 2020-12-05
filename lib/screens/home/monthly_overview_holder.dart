@@ -27,6 +27,10 @@ class _MonthlyOverviewHolderState extends State<MonthlyOverviewHolder> {
       context,
     );
 
+    if (expenditures == null) {
+      return Text('Still loading .. Please wait');
+    }
+
     MonthlyOverview _monthlyOverview = _getMonthlyOverviewBefore(
       widget.selectedExpenditureIndex,
       expenditures,
@@ -52,14 +56,12 @@ class _MonthlyOverviewHolderState extends State<MonthlyOverviewHolder> {
         ),
         color: primaryColor,
       ),
-      child: expenditures == null
-          ? Text('Still loading .. Please wait')
-          : _MonthlyOverviewDetail(
-              monthYear: _monthlyOverview.monthYear,
-              income: _monthlyOverview.income.toString(),
-              balance: _monthlyOverview.balance.toString(),
-              expenses: _monthlyOverview.expenses.toString(),
-            ),
+      child: _MonthlyOverviewDetail(
+        monthYear: _monthlyOverview.monthYear,
+        income: _monthlyOverview.income.toString(),
+        balance: _monthlyOverview.balance.toString(),
+        expenses: _monthlyOverview.expenses.toString(),
+      ),
     );
   }
 
