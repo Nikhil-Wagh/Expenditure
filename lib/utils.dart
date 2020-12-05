@@ -17,10 +17,9 @@ class Utils {
     return DateFormat.yMMM().format(DateTime(year, month));
   }
 
-  static DateTime dateFromTimestamp(Timestamp timestamp) {
+  static DateTime dateTimeFromTimestamp(Timestamp timestamp) {
     int _microSecondsSinceEpoch = timestamp.microsecondsSinceEpoch;
     DateTime _dateTime = DateTime.fromMicrosecondsSinceEpoch(_microSecondsSinceEpoch);
     return DateTime(_dateTime.year, _dateTime.month);
   }
-
 }
