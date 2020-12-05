@@ -1,13 +1,12 @@
 import 'package:expenditure/constants.dart';
 import 'package:expenditure/models/expenditure.dart';
 import 'package:expenditure/models/user.dart' as mUser;
-import 'package:expenditure/screens/home/recent_expenditures.dart';
-import 'package:expenditure/services/auth.dart';
 import 'package:expenditure/services/database.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'home_screen_app_bar.dart';
+import 'home_screen_body.dart';
 import 'monthly_overview_holder.dart';
 
 class Home extends StatelessWidget {
@@ -23,16 +22,19 @@ class Home extends StatelessWidget {
           child: Container(
             margin: EdgeInsets.all(mMargin),
             child: Center(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  HomeScreenAppBar(
-                    displayName: user.displayName,
-                    photoURL: user.photoURL,
-                  ),
-                  MonthlyOverviewHolder(),
-                  RecentExpenditures(uid: user.uid),
-                ],
+              child: StreamProvider<List<Expenditure>>.value(
+                value: DatabaseService().expenditures(),
+                child: Column(
+                  children: [
+                    HomeScreenAppBar(
+                      displayName: user.displayName,
+                      photoURL: user.photoURL,
+                    ),
+                    HomeScreenBody(),
+                    // MonthlyOverviewHolder(),
+                    // RecentExpenditures(uid: user.uid),
+                  ],
+                ),
               ),
             ),
           ),

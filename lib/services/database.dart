@@ -5,12 +5,21 @@ import 'package:expenditure/models/user.dart';
 import 'package:expenditure/models/monthly_overview.dart';
 import 'package:expenditure/services/auth.dart';
 import 'package:expenditure/utils.dart';
+import 'package:flutter/material.dart';
 
 import 'dart:io';
 
 import 'package:flutter/src/widgets/async.dart';
 
 class DatabaseService {
+  /*
+    Functions
+    - download list of expenditures between dates
+    - get list of expenditures
+    - get income for any point in time/index
+    - get expenditures details till some point time/index
+  */
+
   final String uid = AuthService().currentUser().uid;
   FirebaseFirestore _firestoreInstance;
   DocumentReference _userDoc;
@@ -34,9 +43,30 @@ class DatabaseService {
     _expendituresCollection = _userDoc.collection(EXPENDITURES_COLLECTION);
   }
 
-  static List<Expenditure> expendituresListFromSnapshots(QuerySnapshot querySnapshot) {
+  Stream<List<Expenditure>> expenditures({DateTime startDate, DateTime endDate}) {
+    print("[info] DatabaseService.expenditure Creating a stream");
+    // 1st January, 1970
+    if (startDate == null) startDate = DateTime.parse(DEFAULT_START_DATE);
+
+    // Forever
+    if (endDate == null) endDate = DateTime.parse(DEFAULT_END_DATE);
+    return _expendituresCollection
+        .where(
+          'timestamp',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(startDate),
+        )
+        .where(
+          'timestamp',
+          isLessThan: Timestamp.fromDate(endDate),
+        )
+        .orderBy('timestamp')
+        .snapshots()
+        .map(_expendituresListFromSnapshots);
+  }
+
+  List<Expenditure> _expendituresListFromSnapshots(QuerySnapshot querySnapshot) {
     // Ideally these values should not be null and should raise error if null
-    if (querySnapshot == null) return null;
+    if (querySnapshot == null) return [];
     print('[debug] DatabaseService._expendituresListFromSnapshots.querySnapshot.size = ${querySnapshot.size}');
     return querySnapshot.docs.map((doc) {
       print('[debug] DatabaseService._expendituresListFromSnapshots.doc = ${doc.data()}');
@@ -52,13 +82,6 @@ class DatabaseService {
 
   Future updateUserData(User user) async {
     return await _userDoc.set(user.toMap());
-  }
-
-  Stream<QuerySnapshot> get expenditures {
-    _expendituresCollection.snapshots().forEach((element) {
-      for (var data in element.docs) print('[debug] data = ${data.data()}');
-    });
-    return _expendituresCollection.snapshots(); //.map(_expendituresListFromSnapshots);
   }
 
   Future getUserSnapshot() async {
@@ -92,6 +115,7 @@ class DatabaseService {
   MonthlyOverview monthlyOverviewFromSnapshot(AsyncSnapshot<DocumentSnapshot> snapshot) {
     print('[debug] monthlyOverviewFromSnapshot.snapshot = ${snapshot.data.data()}');
     Map<String, dynamic> data = snapshot.data.data();
+    if (data == null) throw 'No data from snapshot = $snapshot';
     print('[debug] snapshot reference = ${snapshot.data.reference}');
     return MonthlyOverview(expenses: data['expenses'], income: data['income'], month: data['month'], year: data['year']);
   }

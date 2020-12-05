@@ -22,3 +22,6 @@ const mMargin = 8.0;
 const USERS_COLLECTION = 'users';
 const EXPENDITURES_COLLECTION = 'expenditures';
 const MONTHLY_OVERVIEW_COLLECTION = 'monthly_overview';
+
+const DEFAULT_START_DATE = "1970-01-01";
+const DEFAULT_END_DATE = "2200-12-31";

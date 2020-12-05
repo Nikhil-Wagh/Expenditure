@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 class Expenditure {
+  int id;
   Amount amount;
   String description, mode;
   Timestamp timestamp;
@@ -28,6 +29,10 @@ class Amount {
     if (currency == null) {
       // currency = Util.getCurrency();
     }
+  }
+
+  double toDouble() {
+    return _amount;
   }
 
   @override
