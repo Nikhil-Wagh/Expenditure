@@ -2,22 +2,38 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 class Expenditure {
-  int id;
-  Amount amount;
+  DocumentReference ref;
+  Amount _amount;
   String description, mode;
   Timestamp timestamp;
 
-  Expenditure({double amount, this.description, this.mode, this.timestamp}) {
+  Expenditure({this.ref, double amount, this.description, this.mode, this.timestamp}) {
     print('[info] Creating new expenditure');
     print('[debug] Models.Expenditure.data = $amount, $description, $mode, $timestamp');
-    this.amount = Amount(amount);
-    if (this.timestamp == null) {
-      this.timestamp = Timestamp.now();
-    }
+    this._amount = Amount(amount);
   }
 
   String timestampToString() {
     return DateFormat.MMMd().addPattern(', ').add_jm().format(timestamp.toDate());
+  }
+
+  String toString() {
+    return '[ id = $ref, amount = ${amount}, description $description, '
+        'mode = $mode timestamp = $timestamp ]';
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': ref,
+      'amount': amount,
+      'description': description,
+      'mode': mode,
+      'timestamp': timestamp
+    };
+  }
+
+  double get amount {
+    return _amount.toDouble();
   }
 }
 

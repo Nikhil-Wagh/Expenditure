@@ -16,7 +16,7 @@ class MonthlyOverview {
     this.expenses += amount;
   }
 
-  balance() {
+  get balance {
     print('[debug] MonthlyOverview :: income = $income, expenses = $expenses');
     return income - expenses;
   }

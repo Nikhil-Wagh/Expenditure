@@ -1,12 +1,20 @@
 import 'package:expenditure/constants.dart';
 import 'package:expenditure/models/expenditure.dart';
+import 'package:expenditure/models/monthly_overview.dart';
+import 'package:expenditure/utils.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class MonthlyOverviewHolder extends StatefulWidget {
+  // https://stackoverflow.com/a/43791071/6890234
+  // Instead of passing arguments to children widgets
   final int selectedExpenditureIndex;
 
-  MonthlyOverviewHolder({@required this.selectedExpenditureIndex});
+  MonthlyOverviewHolder({@required this.selectedExpenditureIndex}) {
+    debugPrint('[debug] MonthlyOverviewHolder.selectedExpenditureIndex = '
+        '$selectedExpenditureIndex');
+  }
 
   @override
   _MonthlyOverviewHolderState createState() => _MonthlyOverviewHolderState();
@@ -15,59 +23,105 @@ class MonthlyOverviewHolder extends StatefulWidget {
 class _MonthlyOverviewHolderState extends State<MonthlyOverviewHolder> {
   @override
   Widget build(BuildContext context) {
-    final List<Expenditure> expenditures = Provider.of<List<Expenditure>>(context);
-    print("[debug] MonthlyOverviewHolderState.build.expenditures = $expenditures");
+    final List<Expenditure> expenditures = Provider.of<List<Expenditure>>(
+      context,
+    );
+
+    MonthlyOverview _monthlyOverview = _getMonthlyOverviewBefore(
+      widget.selectedExpenditureIndex,
+      expenditures,
+    );
     return Container(
-        width: MediaQuery.of(context).size.width,
-        constraints: BoxConstraints(minHeight: 150),
-        margin: EdgeInsets.all(mMargin),
-        decoration: BoxDecoration(
-          backgroundBlendMode: BlendMode.darken,
-          borderRadius: BorderRadius.all(Radius.circular(20)),
-          gradient: LinearGradient(
-            tileMode: TileMode.repeated,
-            // transform: ,
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            // transform: GradientTransform(),
-            colors: [
-              // Colors.orange, // Accents with purple
-              Colors.purple[900], // Accents with greens
-              Colors.indigo, // Accents with red
-            ],
-          ),
-          color: primaryColor,
+      width: MediaQuery.of(context).size.width,
+      constraints: BoxConstraints(minHeight: 150),
+      margin: EdgeInsets.all(mMargin),
+      decoration: BoxDecoration(
+        backgroundBlendMode: BlendMode.darken,
+        borderRadius: BorderRadius.all(Radius.circular(20)),
+        gradient: LinearGradient(
+          tileMode: TileMode.repeated,
+          // transform: ,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          // transform: GradientTransform(),
+          colors: [
+            // Colors.orange, // Accents with purple
+            Colors.purple[900], // Accents with greens
+            Colors.indigo, // Accents with red
+          ],
         ),
-        child: _MonthlyOverviewDetail());
+        color: primaryColor,
+      ),
+      child: expenditures == null
+          ? Text('Still loading .. Please wait')
+          : _MonthlyOverviewDetail(
+              monthYear: _monthlyOverview.monthYear,
+              income: _monthlyOverview.income.toString(),
+              balance: _monthlyOverview.balance.toString(),
+              expenses: _monthlyOverview.expenses.toString(),
+            ),
+    );
+  }
+
+  MonthlyOverview _getMonthlyOverviewBefore(
+    int index,
+    List<Expenditure> expenditures,
+  ) {
+    Expenditure selectedExpenditure = expenditures[index];
+    DateTime selectedExpenditureMonthDateTime = Utils.dateTimeFromTimestamp(
+      selectedExpenditure.timestamp,
+    );
+
+    int selectedExpenditureMonth = selectedExpenditureMonthDateTime.month;
+    int selectedExpenditureYear = selectedExpenditureMonthDateTime.year;
+
+    // TODO: Fix me, income would come from a static doc
+    double income = 1000000;
+    double expenses = 0;
+
+    // index 0 is the latest expenditure
+    for (int i = index; i < expenditures.length; i++) {
+      DateTime currentExpenditureMonthDateTime = Utils.dateTimeFromTimestamp(
+        expenditures[i].timestamp,
+      );
+      int currentMonth = currentExpenditureMonthDateTime.month;
+      int currentYear = currentExpenditureMonthDateTime.year;
+      // comparing with currentMonth is also fine
+      if (currentMonth != selectedExpenditureMonth || currentYear != selectedExpenditureYear) {
+        break;
+      }
+
+      expenses += expenditures[i].amount;
+    }
+
+    return MonthlyOverview(
+      expenses: expenses,
+      income: income,
+      month: selectedExpenditureMonth,
+      year: selectedExpenditureYear,
+    );
   }
 }
 
-class _MonthlyOverviewDetail extends StatelessWidget {
-  List<Expenditure> expenditures;
-  DateTime currentMonth;
-  _MonthlyOverviewDetail({this.expenditures, this.currentMonth});
+class _MonthlyOverviewDetail extends StatefulWidget {
+  final String balance, income, expenses;
+  final String monthYear;
+  _MonthlyOverviewDetail({
+    this.monthYear,
+    this.income,
+    this.balance,
+    this.expenses,
+  });
 
-  double _expensesFrom(List<Expenditure> expenditures) {
-    double expenses = 0;
-    expenditures.forEach((element) {
-      expenses += element.amount.toDouble();
-    });
-    return expenses;
-  }
+  @override
+  __MonthlyOverviewDetailState createState() => __MonthlyOverviewDetailState();
+}
 
-  double _incomeFor(int month, int year) {}
-
-  // MonthlyOverview _monthlyOverviewFromExpenditures() {
-  //   double _expenses = _expensesFrom(expenditures);
-  //   double _income = DatabaseService.getIncome();
-  //   return MonthlyOverview(expenses: _expenses, income: _income, month: this.month, year: this.year);
-  // }
+class __MonthlyOverviewDetailState extends State<_MonthlyOverviewDetail> {
+  final Color fontColor = Colors.white;
 
   @override
   Widget build(BuildContext context) {
-    final Color fontColor = Colors.white;
-
-    // MonthlyOverview monthlyOverviewData = _monthlyOverviewFromExpenditures();
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 30),
       child: Column(
@@ -88,8 +142,7 @@ class _MonthlyOverviewDetail extends StatelessWidget {
                   ),
                   SizedBox(height: 2),
                   Text(
-                    "Balance",
-                    // monthlyOverviewData.balance().toString(),
+                    widget.balance,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: fontColor,
@@ -106,8 +159,7 @@ class _MonthlyOverviewDetail extends StatelessWidget {
                   children: [
                     Text(
                       // Take this from monthly overview object
-                      "2020, 11",
-                      // monthlyOverviewData.monthYear,
+                      widget.monthYear,
                       style: TextStyle(
                         fontSize: 16,
                         color: fontColor,
@@ -128,7 +180,6 @@ class _MonthlyOverviewDetail extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 0),
           Divider(
             height: 40,
             thickness: 1,
@@ -148,7 +199,7 @@ class _MonthlyOverviewDetail extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    "Income",
+                    widget.income,
                     // monthlyOverviewData.income.toString(),
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -170,7 +221,7 @@ class _MonthlyOverviewDetail extends StatelessWidget {
                   ),
                   SizedBox(width: 10),
                   Text(
-                    "Expenses",
+                    widget.expenses,
                     // monthlyOverviewData.expenses.toString(),
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
