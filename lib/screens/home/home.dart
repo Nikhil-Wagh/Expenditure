@@ -7,26 +7,38 @@ import 'package:provider/provider.dart';
 
 import 'home_screen_app_bar.dart';
 import 'home_screen_body.dart';
-import 'monthly_overview_holder.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   final mUser.User user;
   Home({this.user});
 
   @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  int _selectedScreenIndex = 0;
+
+  void _onBottomNavBarItemTap(int index) {
+    setState(() {
+      _selectedScreenIndex = index;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    print("[debug] _HomeState.user.uid = ${user.uid}");
+    print("[debug] _HomeState.user.uid = ${widget.user.uid}");
     return Scaffold(
       body: Container(
-        margin: EdgeInsets.all(mMargin),
+        margin: EdgeInsets.only(left: mMargin, right: mMargin, top: mMargin),
         child: Center(
           child: StreamProvider<List<Expenditure>>.value(
             value: DatabaseService().expenditures(),
             child: Column(
               children: [
                 HomeScreenAppBar(
-                  displayName: user.displayName,
-                  photoURL: user.photoURL,
+                  displayName: widget.user.displayName,
+                  photoURL: widget.user.photoURL,
                 ),
                 HomeScreenBody(),
                 // MonthlyOverviewHolder(),
@@ -37,6 +49,37 @@ class Home extends StatelessWidget {
         ),
       ),
       backgroundColor: Colors.white,
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        selectedIconTheme: IconThemeData(color: Colors.indigo),
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        iconSize: 32,
+        currentIndex: _selectedScreenIndex,
+        onTap: _onBottomNavBarItemTap,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            title: Text("Home"),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            title: Text("Search"),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add),
+            title: Text("Add"),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.graphic_eq),
+            title: Text("Analytics"),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            title: Text("Settings"),
+          ),
+        ],
+      ),
     );
   }
 }
