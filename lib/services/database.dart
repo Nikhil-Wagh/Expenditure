@@ -49,6 +49,9 @@ class DatabaseService {
   }
 
   Future updateUserData(User user) async {
+    if (_userDoc == null) {
+      _userDoc = _getUserDoc();
+    }
     return await _userDoc.set(user.toMap());
   }
 
