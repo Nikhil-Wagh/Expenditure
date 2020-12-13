@@ -18,8 +18,12 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              MonthlyOverviewHolder(selectedExpenditureIndex: _selectedExpenditure),
-              RecentExpenditures(selectedExpenditureIndex: _selectedExpenditure),
+              MonthlyOverviewHolder(
+                selectedExpenditureIndex: _selectedExpenditure,
+              ),
+              RecentExpenditures(
+                selectedExpenditureIndex: _selectedExpenditure,
+              ),
             ],
           ),
           onNotification: (notification) {
@@ -29,7 +33,8 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
               setState(() {
                 _selectedExpenditure = notification.selectedIndex;
               });
-              print('[debug] HomeScreenBody _selectedExpenditure = $_selectedExpenditure');
+              print('[debug] HomeScreenBody '
+                  '_selectedExpenditure = $_selectedExpenditure');
               return true;
             }
             return false;
