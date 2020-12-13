@@ -1,5 +1,6 @@
 // Strings
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 const welcome = "Welcome";
 const helloString = "Hello";
@@ -25,3 +26,22 @@ const MONTHLY_OVERVIEW_COLLECTION = 'monthly_overview';
 
 const DEFAULT_START_DATE = "1970-01-01";
 const DEFAULT_END_DATE = "2200-12-31";
+
+const List<Map<String, dynamic>> PAYMENT_MODES = [
+  {
+    'name': 'CASH',
+    'icon': MdiIcons.cash,
+  },
+  {
+    'name': 'UPI',
+    'icon': Icons.mobile_friendly_outlined,
+  },
+  {
+    'name': 'CARD',
+    'icon': MdiIcons.creditCard,
+  },
+  {
+    'name': 'NET BANKING',
+    'icon': MdiIcons.bank,
+  },
+];

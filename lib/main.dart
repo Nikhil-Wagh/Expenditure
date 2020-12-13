@@ -36,7 +36,15 @@ class MyApp extends StatelessWidget {
                 primarySwatch: primaryColor,
                 visualDensity: VisualDensity.adaptivePlatformDensity,
               ),
-              home: SafeArea(child: Wrapper()),
+              home: Navigator(
+                pages: [
+                  MaterialPage(
+                    key: ValueKey('Home'),
+                    child: SafeArea(child: Wrapper()),
+                  )
+                ],
+                onPopPage: (route, result) => route.didPop(result),
+              ),
             ),
           );
         }
