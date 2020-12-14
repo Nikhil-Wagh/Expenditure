@@ -157,7 +157,6 @@ class _AddNewExpenditureBodyState extends State<AddNewExpenditureBody> {
     );
   }
 
-  // TODO: Fix me
   Widget _timestampField() {
     return TextFormField(
       keyboardType: TextInputType.datetime,
@@ -166,8 +165,6 @@ class _AddNewExpenditureBodyState extends State<AddNewExpenditureBody> {
         labelText: 'Timestamp',
         prefixIcon: Icon(MdiIcons.clock),
       ),
-      // enabled: false,
-      // initialValue: Timestamp.now().toDate().toString(),
       onTap: () {
         _selectDate(context);
       },
@@ -177,6 +174,12 @@ class _AddNewExpenditureBodyState extends State<AddNewExpenditureBody> {
 
   Widget _modeField() {
     return DropdownButtonFormField<Item>(
+      decoration: InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: 'Payment Mode',
+          prefixIcon: Icon(
+            MdiIcons.function,
+          )),
       items: _modeItems.map((item) {
         return DropdownMenuItem<Item>(
           value: item,
@@ -197,12 +200,10 @@ class _AddNewExpenditureBodyState extends State<AddNewExpenditureBody> {
         });
       },
       value: _mode,
-      hint: Text('Payment Mode'),
     );
   }
 
   void _onSavePressed() {
-    // Timestamp _timestamp = Timestamp.fromDate(DateTime(selectedDate.year, selectedDate.month, selectedDate.day, selectedTime.hour, selectedTime.minute));
     Expenditure newExpenditure = Expenditure(
       amount: _amount,
       description: _description,
@@ -268,7 +269,9 @@ class _AddNewExpenditureBodyState extends State<AddNewExpenditureBody> {
       selectedTime.minute,
     );
     _timestamp = Timestamp.fromDate(_selectedTimestamp);
-    _dateTimeFieldController.text = DateFormat.yMMMMd().add_jm().format(_selectedTimestamp);
+    _dateTimeFieldController.text = DateFormat.yMMMMd().add_jm().format(
+          _selectedTimestamp,
+        );
   }
 }
 
