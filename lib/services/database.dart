@@ -55,6 +55,12 @@ class DatabaseService {
     return await _userDoc.set(user.toMap());
   }
 
+  static Future<DocumentReference> addNewExpenditure(Expenditure newExpenditure) {
+    _expendituresCollection = _expendituresCollection ?? _getExpendituresCollection();
+
+    return _expendituresCollection.add(newExpenditure.toMap());
+  }
+
   List<Expenditure> _expendituresListFromSnapshots(QuerySnapshot querySnapshot) {
     // Ideally these values should not be null and should raise error if null
     if (querySnapshot == null) return [];

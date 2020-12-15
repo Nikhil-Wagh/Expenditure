@@ -49,7 +49,7 @@ class _MonthlyOverviewHolderState extends State<MonthlyOverviewHolder> {
           end: Alignment.bottomRight,
           // transform: GradientTransform(),
           colors: [
-            // Colors.orange, // Accents with purple
+// Colors.orange, // Accents with purple
             Colors.purple[900], // Accents with greens
             Colors.indigo, // Accents with red
           ],
@@ -70,7 +70,7 @@ class _MonthlyOverviewHolderState extends State<MonthlyOverviewHolder> {
     List<Expenditure> expenditures,
   ) {
     Expenditure selectedExpenditure = expenditures[index];
-    DateTime selectedExpenditureMonthDateTime = Utils.dateTimeFromTimestamp(
+    DateTime selectedExpenditureMonthDateTime = Utils.dateFromTimestamp(
       selectedExpenditure.timestamp,
     );
 
@@ -83,7 +83,7 @@ class _MonthlyOverviewHolderState extends State<MonthlyOverviewHolder> {
 
     // index 0 is the latest expenditure
     for (int i = index; i < expenditures.length; i++) {
-      DateTime currentExpenditureMonthDateTime = Utils.dateTimeFromTimestamp(
+      DateTime currentExpenditureMonthDateTime = Utils.dateFromTimestamp(
         expenditures[i].timestamp,
       );
       int currentMonth = currentExpenditureMonthDateTime.month;

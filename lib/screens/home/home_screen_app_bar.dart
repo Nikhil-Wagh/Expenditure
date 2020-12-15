@@ -2,7 +2,7 @@ import 'package:expenditure/services/auth.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreenAppBar extends StatelessWidget {
-  String displayName, photoURL;
+  final String displayName, photoURL;
   HomeScreenAppBar({this.displayName, this.photoURL});
 
   @override
