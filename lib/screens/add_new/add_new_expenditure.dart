@@ -62,7 +62,7 @@ class AddNewExpenditureBody extends StatefulWidget {
 }
 
 class _AddNewExpenditureBodyState extends State<AddNewExpenditureBody> {
-  GlobalKey _addNexExpenditureFormKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _addNewExpenditureFormKey = GlobalKey<FormState>();
 
   double _amount;
   Timestamp _timestamp = Timestamp.now();
@@ -74,136 +74,152 @@ class _AddNewExpenditureBodyState extends State<AddNewExpenditureBody> {
 
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
-  TextEditingController _dateTimeFieldController = TextEditingController();
+  TextEditingController _dateTimeFieldController = TextEditingController(
+      text: DateFormat.yMMMMd().add_jm().format(
+            DateTime.now(),
+          ));
 
   @override
   Widget build(BuildContext context) {
     debugPrint('[debug] building AddNewExpenditureBody');
-    if (_modeItems.isEmpty)
+    if (_modeItems.isEmpty) {
       for (Map mode in PAYMENT_MODES) {
         _modeItems.add(Item(name: mode['name'], icon: mode['icon']));
       }
+      _mode = _modeItems.first;
+    }
 
     return Expanded(
-      child: Container(
-        padding: EdgeInsets.all(16),
+      child: Form(
+        key: _addNewExpenditureFormKey,
         child: Column(
           children: [
             Expanded(
-              child: Form(
-                // key: _addNexExpenditureFormKey,
-                child: Column(
-                  children: [
-                    _amountField(),
-                    SizedBox(height: 12),
-                    _descriptionField(),
-                    SizedBox(height: 12),
-                    _timestampField(),
-                    SizedBox(height: 14),
-                    _modeField(),
-                  ],
-                ),
+              child: Column(
+                children: [
+                  _buildAmountField(),
+                  _buildDescriptionField(),
+                  _buildTimestampField(),
+                  _buildModeField(),
+                ],
               ),
             ),
-            RaisedButton(
-              onPressed: _onSavePressed,
-              child: Text(
-                'Save',
-                style: TextStyle(color: Colors.white),
-              ),
-              color: Colors.indigo,
-            ),
+            _buildSaveButton(),
           ],
         ),
       ),
     );
   }
 
-  Widget _amountField() {
-    return TextFormField(
-      keyboardType: TextInputType.number,
-      decoration: InputDecoration(
-        border: OutlineInputBorder(),
-        labelText: 'Amount',
-        hintText: '0.00',
-        prefixIcon: Icon(MdiIcons.currencyInr),
+  Widget _buildAmountField() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextFormField(
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: 'Amount',
+          hintText: '0.00',
+          prefixIcon: Icon(MdiIcons.currencyInr),
+        ),
+        validator: InputValidator.validateAmount,
+        onSaved: (newValue) {
+          _amount = double.parse(newValue.trim());
+        },
+        autovalidateMode: AutovalidateMode.onUserInteraction,
       ),
-      validator: InputValidator.validateAmount,
-      onChanged: (val) {
-        setState(() {
-          _amount = double.parse(val.trim());
-        });
-      },
     );
   }
 
-  Widget _descriptionField() {
-    return TextFormField(
-      keyboardType: TextInputType.multiline,
-      decoration: InputDecoration(
-        border: OutlineInputBorder(),
-        labelText: 'Description',
-        prefixIcon: Icon(MdiIcons.textBox),
+  Widget _buildDescriptionField() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextFormField(
+        keyboardType: TextInputType.multiline,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: 'Description',
+          prefixIcon: Icon(MdiIcons.textBox),
+        ),
+        validator: InputValidator.validateDescription,
+        onSaved: (newValue) {
+          _description = newValue.trim();
+        },
+        maxLines: 3,
+        minLines: 1,
       ),
-      validator: InputValidator.validateDescription,
-      onChanged: (val) {
-        setState(() {
-          _description = val.trim();
-        });
-      },
-      maxLines: 3,
-      minLines: 3,
-      textAlignVertical: TextAlignVertical.center,
     );
   }
 
-  Widget _timestampField() {
-    return TextFormField(
-      keyboardType: TextInputType.datetime,
-      decoration: InputDecoration(
-        border: OutlineInputBorder(),
-        labelText: 'Timestamp',
-        prefixIcon: Icon(MdiIcons.clock),
+  Widget _buildTimestampField() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextFormField(
+        keyboardType: TextInputType.datetime,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: 'Timestamp',
+          prefixIcon: Icon(MdiIcons.clock),
+        ),
+        onTap: () {
+          _selectDate(context);
+        },
+        controller: _dateTimeFieldController,
       ),
-      onTap: () {
-        _selectDate(context);
-      },
-      controller: _dateTimeFieldController,
     );
   }
 
-  Widget _modeField() {
-    return DropdownButtonFormField<Item>(
-      decoration: InputDecoration(
+  Widget _buildModeField() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: DropdownButtonFormField<Item>(
+        decoration: InputDecoration(
           border: OutlineInputBorder(),
           labelText: 'Payment Mode',
-          prefixIcon: Icon(
-            MdiIcons.function,
-          )),
-      items: _modeItems.map((item) {
-        return DropdownMenuItem<Item>(
-          value: item,
-          child: Row(
-            children: [
-              Icon(item.icon),
-              SizedBox(width: 12),
-              Text(item.name),
-            ],
-          ),
-        );
-      }).toList(),
-      onChanged: (value) {
-        setState(() {
-          debugPrint('AddNewExpenditure.modeField updated');
-          debugPrint('value = ${value.name} ${value.icon}');
-          _mode = value;
-        });
-      },
-      value: _mode,
+        ),
+        items: _modeItems.map((item) {
+          return DropdownMenuItem<Item>(
+            value: item,
+            child: Row(
+              children: [
+                Icon(item.icon),
+                SizedBox(width: 12),
+                Text(item.name),
+              ],
+            ),
+          );
+        }).toList(),
+        onChanged: (value) {
+          setState(() {
+            debugPrint('AddNewExpenditure.modeField updated');
+            debugPrint('value = ${value.name} ${value.icon}');
+            _mode = value;
+          });
+        },
+        value: _mode,
+      ),
+    );
+  }
+
+  Widget _buildSaveButton() {
+    return RaisedButton(
+      onPressed: _onSavePressed,
+      child: Text(
+        'Save',
+        style: TextStyle(color: Colors.white),
+      ),
+      color: Colors.indigo,
     );
   }
 
   void _onSavePressed() {
+    debugPrint('[debug] _onSavePressed()');
+    if (!_addNewExpenditureFormKey.currentState.validate()) {
+      return;
+    }
+
+    _addNewExpenditureFormKey.currentState.save();
+
     Expenditure newExpenditure = Expenditure(
       amount: _amount,
       description: _description,
@@ -261,16 +277,16 @@ class _AddNewExpenditureBodyState extends State<AddNewExpenditureBody> {
       });
     }
 
-    DateTime _selectedTimestamp = DateTime(
+    DateTime _selectedDateTime = DateTime(
       selectedDate.year,
       selectedDate.month,
       selectedDate.day,
       selectedTime.hour,
       selectedTime.minute,
     );
-    _timestamp = Timestamp.fromDate(_selectedTimestamp);
+    _timestamp = Timestamp.fromDate(_selectedDateTime);
     _dateTimeFieldController.text = DateFormat.yMMMMd().add_jm().format(
-          _selectedTimestamp,
+          _selectedDateTime,
         );
   }
 }
