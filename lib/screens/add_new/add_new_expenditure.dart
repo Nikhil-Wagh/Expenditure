@@ -45,11 +45,14 @@ class AddNexExpenditureAppBar extends StatelessWidget {
           ),
           // SizedBox(width: 16),
           Center(
-            child: Text(
-              'Add New Expenditure',
-              style: TextStyle(fontSize: 24, color: Colors.black, fontWeight: FontWeight.bold),
+              child: Text(
+            'Add New Expenditure',
+            style: TextStyle(
+              fontSize: 24,
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
             ),
-          )
+          ))
         ],
       ),
     );
@@ -213,12 +216,13 @@ class _AddNewExpenditureBodyState extends State<AddNewExpenditureBody> {
   }
 
   void _onSavePressed() {
-    debugPrint('[debug] _onSavePressed()');
+    debugPrint('[info] _onSavePressed()');
     if (!_addNewExpenditureFormKey.currentState.validate()) {
       return;
     }
 
     _addNewExpenditureFormKey.currentState.save();
+    // _addNewExpenditureFormKey.currentState.
 
     Expenditure newExpenditure = Expenditure(
       amount: _amount,
@@ -230,7 +234,28 @@ class _AddNewExpenditureBodyState extends State<AddNewExpenditureBody> {
     debugPrint('AddNewExpenditure._onSavePressed called');
     debugPrint('AddNewExpenditure._onSavePressed.newExpenditure = '
         '${newExpenditure.toString()}');
-    DatabaseService.addNewExpenditure(newExpenditure);
+    Future<DocumentReference> addedDocRef = DatabaseService.addNewExpenditure(
+      newExpenditure,
+    );
+
+    addedDocRef.then((_) {
+      debugPrint('[info] AddNewExpenditure._onSavePressed :: '
+          'Saved new expenditure successfully');
+      debugPrint('[info] AddNewExpenditure._onSavePressed :: Resetting fields');
+      _addNewExpenditureFormKey.currentState.reset();
+      SnackBar _successSnackBar = SnackBar(
+        content: Text('Expenditure saved successfully'),
+      );
+      Scaffold.of(context).showSnackBar(_successSnackBar);
+      // TODO: Goto Home now
+    }).catchError((error) {
+      debugPrint('[error] Error occurred while saving new Expenditure');
+      debugPrint('[error] Original error = $error');
+      SnackBar _errorSnackBar = SnackBar(
+        content: Text('Unable to save Expenditure, please try again'),
+      );
+      Scaffold.of(context).showSnackBar(_errorSnackBar);
+    });
   }
 
   void _selectDate(BuildContext context) async {
@@ -254,18 +279,23 @@ class _AddNewExpenditureBodyState extends State<AddNewExpenditureBody> {
 
     final TimeOfDay _initialTime = selectedTime;
 
-    final TimeOfDay pickedTime = await showTimePicker(context: context, initialTime: _initialTime);
+    final TimeOfDay pickedTime = await showTimePicker(
+      context: context,
+      initialTime: _initialTime,
+    );
 
     if (pickedDate != null) {
       setState(() {
-        debugPrint('[debug] AddNewExpenditure._selectDate.pickedDate = $pickedDate');
+        debugPrint('[debug] AddNewExpenditure._selectDate.pickedDate'
+            ' = $pickedDate');
         selectedDate = pickedDate;
       });
     }
 
     if (pickedTime != null) {
       setState(() {
-        debugPrint('[debug] AddNewExpenditure._selectDate.pickedTime = $pickedTime');
+        debugPrint('[debug] AddNewExpenditure._selectDate.pickedTime'
+            ' = $pickedTime');
         _timestamp = Timestamp.fromDate(DateTime(
           selectedDate.year,
           selectedDate.month,
