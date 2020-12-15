@@ -55,10 +55,10 @@ class DatabaseService {
     return await _userDoc.set(user.toMap());
   }
 
-  static addNewExpenditure(Expenditure newExpenditure) {
+  static Future<DocumentReference> addNewExpenditure(Expenditure newExpenditure) {
     _expendituresCollection = _expendituresCollection ?? _getExpendituresCollection();
 
-    _expendituresCollection.add(newExpenditure.toMap());
+    return _expendituresCollection.add(newExpenditure.toMap());
   }
 
   List<Expenditure> _expendituresListFromSnapshots(QuerySnapshot querySnapshot) {
