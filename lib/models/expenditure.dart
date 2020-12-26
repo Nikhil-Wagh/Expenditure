@@ -18,8 +18,8 @@ class Expenditure {
   }
 
   String toString() {
-    return '[ id = $ref, amount = ${amount}, description $description, '
-        'mode = $mode timestamp = $timestamp ]';
+    return '[ ref = $ref, amount = $amount, description $description, '
+        'mode = $mode, timestamp = $timestamp ]';
   }
 
   Map<String, dynamic> toMap() {

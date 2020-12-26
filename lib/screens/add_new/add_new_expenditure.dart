@@ -19,6 +19,7 @@ class AddNewExpenditure extends StatefulWidget {
 class _AddNewExpenditureState extends State<AddNewExpenditure> {
   @override
   Widget build(BuildContext context) {
+    debugPrint('[info] AddNewExpenditure.build called');
     return Container(
         padding: EdgeInsets.only(left: mMargin, right: mMargin, top: mMargin),
         child: Column(

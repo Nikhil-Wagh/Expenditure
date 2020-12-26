@@ -1,7 +1,6 @@
 import 'package:expenditure/constants.dart';
 import 'package:expenditure/models/expenditure.dart';
 import 'package:expenditure/models/user.dart' as mUser;
-import 'package:expenditure/services/auth.dart';
 import 'package:expenditure/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,6 +19,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
+    debugPrint('[info] Home.build called');
     print("[debug] _HomeState.user.uid = ${widget.user.uid}");
     return Container(
       margin: EdgeInsets.only(left: mMargin, right: mMargin, top: mMargin),
@@ -33,8 +33,6 @@ class _HomeState extends State<Home> {
                 photoURL: widget.user.photoURL,
               ),
               HomeScreenBody(),
-              // MonthlyOverviewHolder(),
-              // RecentExpenditures(uid: user.uid),
             ],
           ),
         ),
