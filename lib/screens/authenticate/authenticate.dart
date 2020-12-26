@@ -142,6 +142,7 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         Container(
+          margin: EdgeInsets.symmetric(horizontal: 10),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(

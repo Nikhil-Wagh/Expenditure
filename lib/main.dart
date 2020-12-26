@@ -19,6 +19,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('[info] MyApp.build called');
+
     return FutureBuilder(
       future: _initialization,
       builder: (context, snapshot) {
@@ -36,6 +38,7 @@ class MyApp extends StatelessWidget {
                 primarySwatch: primaryColor,
                 visualDensity: VisualDensity.adaptivePlatformDensity,
               ),
+              // FIX ME: This navigator is not supposed to be here.
               home: Navigator(
                 pages: [
                   MaterialPage(

@@ -61,12 +61,18 @@ class DatabaseService {
     return _expendituresCollection.add(newExpenditure.toMap());
   }
 
+  static Future<void> removeExpenditure(Expenditure expenditure) {
+    return expenditure.ref.delete();
+  }
+
   List<Expenditure> _expendituresListFromSnapshots(QuerySnapshot querySnapshot) {
     // Ideally these values should not be null and should raise error if null
     if (querySnapshot == null) return [];
-    print('[debug] DatabaseService._expendituresListFromSnapshots.querySnapshot.size = ${querySnapshot.size}');
+    print('[debug] DatabaseService._expendituresListFromSnapshots.'
+        'querySnapshot.size = ${querySnapshot.size}');
     return querySnapshot.docs.map((doc) {
-      print('[debug] DatabaseService._expendituresListFromSnapshots.doc = ${doc.data()}');
+      print('[debug] DatabaseService._expendituresListFromSnapshots.doc = '
+          '${doc.data()}');
       double amount = double.parse(doc.data()['amount'].toString());
       return Expenditure(
         ref: doc.reference,

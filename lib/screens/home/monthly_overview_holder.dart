@@ -4,14 +4,14 @@ import 'package:expenditure/models/monthly_overview.dart';
 import 'package:expenditure/utils.dart';
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class MonthlyOverviewHolder extends StatefulWidget {
   // https://stackoverflow.com/a/43791071/6890234
   // Instead of passing arguments to children widgets
   final int selectedExpenditureIndex;
+  final List<Expenditure> expenditures;
 
-  MonthlyOverviewHolder({@required this.selectedExpenditureIndex}) {
+  MonthlyOverviewHolder({@required this.selectedExpenditureIndex, @required this.expenditures}) {
     debugPrint('[debug] MonthlyOverviewHolder.selectedExpenditureIndex = '
         '$selectedExpenditureIndex');
   }
@@ -23,17 +23,17 @@ class MonthlyOverviewHolder extends StatefulWidget {
 class _MonthlyOverviewHolderState extends State<MonthlyOverviewHolder> {
   @override
   Widget build(BuildContext context) {
-    final List<Expenditure> expenditures = Provider.of<List<Expenditure>>(
-      context,
-    );
+    // final List<Expenditure> expenditures = Provider.of<List<Expenditure>>(
+    //   context,
+    // );
 
-    if (expenditures == null) {
+    if (widget.expenditures == null) {
       return Text('Still loading .. Please wait');
     }
 
     MonthlyOverview _monthlyOverview = _getMonthlyOverviewBefore(
       widget.selectedExpenditureIndex,
-      expenditures,
+      widget.expenditures,
     );
     return Container(
       width: MediaQuery.of(context).size.width,
@@ -69,10 +69,17 @@ class _MonthlyOverviewHolderState extends State<MonthlyOverviewHolder> {
     int index,
     List<Expenditure> expenditures,
   ) {
-    Expenditure selectedExpenditure = expenditures[index];
-    DateTime selectedExpenditureMonthDateTime = Utils.dateFromTimestamp(
-      selectedExpenditure.timestamp,
-    );
+    // FIX ME: throws error when expenditures is empty
+    // datetime should come from date.now() or if index >= 0
+    DateTime selectedExpenditureMonthDateTime;
+    if (expenditures.isEmpty || index >= expenditures.length)
+      selectedExpenditureMonthDateTime = DateTime.now();
+    else {
+      Expenditure selectedExpenditure = expenditures[index];
+      selectedExpenditureMonthDateTime = Utils.dateFromTimestamp(
+        selectedExpenditure.timestamp,
+      );
+    }
 
     int selectedExpenditureMonth = selectedExpenditureMonthDateTime.month;
     int selectedExpenditureYear = selectedExpenditureMonthDateTime.year;
