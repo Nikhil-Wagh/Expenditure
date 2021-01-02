@@ -6,13 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreenAppBar extends StatelessWidget {
-  // HomeScreenAppBar();
-
-  // final String displayName, photoURL;
+  final User user;
+  HomeScreenAppBar({@required this.user});
 
   @override
   Widget build(BuildContext context) {
-    final User user = Provider.of<User>(context);
+    assert(user != null, 'No user provided to HomeScreenAppBar');
+
     final String displayName = user.displayName;
     final String photoURL = user.photoURL;
 

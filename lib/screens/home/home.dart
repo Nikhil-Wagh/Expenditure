@@ -28,10 +28,7 @@ class _HomeState extends State<Home> {
           value: DatabaseService().expenditures(),
           child: Column(
             children: [
-              HomeScreenAppBar(
-                displayName: widget.user.displayName,
-                photoURL: widget.user.photoURL,
-              ),
+              HomeScreenAppBar(user: widget.user),
               HomeScreenBody(),
             ],
           ),
