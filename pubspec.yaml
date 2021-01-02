@@ -51,6 +51,8 @@ dependencies:
   # Material Design iconss
   material_design_icons_flutter: "^4.0.5755"
 
+  scrollable_positioned_list: "^0.1.8"
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
