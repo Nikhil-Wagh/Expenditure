@@ -40,22 +40,22 @@ class _MonthlyOverviewHolderState extends State<MonthlyOverviewHolder> {
       constraints: BoxConstraints(minHeight: 150),
       margin: EdgeInsets.all(mMargin),
       decoration: BoxDecoration(
-        backgroundBlendMode: BlendMode.darken,
-        borderRadius: BorderRadius.all(Radius.circular(20)),
-        gradient: LinearGradient(
-          tileMode: TileMode.repeated,
-          // transform: ,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          // transform: GradientTransform(),
-          colors: [
+          backgroundBlendMode: BlendMode.darken,
+          borderRadius: BorderRadius.all(Radius.circular(20)),
+          gradient: LinearGradient(
+            tileMode: TileMode.repeated,
+            // transform: ,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            // transform: GradientTransform(),
+            colors: [
 // Colors.orange, // Accents with purple
-            Colors.purple[900], // Accents with greens
-            Colors.indigo, // Accents with red
-          ],
-        ),
-        color: primaryColor,
-      ),
+              Colors.purple[900], // Accents with greens
+              Colors.indigo, // Accents with red
+            ],
+          ),
+          color: primaryColor,
+          border: Border.all(color: Colors.black, width: 5)),
       child: _MonthlyOverviewDetail(
         monthYear: _monthlyOverview.monthYear,
         income: _monthlyOverview.income.toString(),
