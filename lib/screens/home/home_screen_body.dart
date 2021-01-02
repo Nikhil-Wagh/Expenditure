@@ -19,10 +19,10 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
       context,
     );
 
-    if (_selectedExpenditureIndex < 0) _selectedExpenditureIndex = 0;
     if (_selectedExpenditureIndex >= expenditures.length) {
       _selectedExpenditureIndex = expenditures.length - 1;
     }
+    if (_selectedExpenditureIndex < 0) _selectedExpenditureIndex = 0;
 
     return Expanded(
       child: Container(
