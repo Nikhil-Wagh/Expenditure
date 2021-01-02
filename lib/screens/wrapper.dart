@@ -1,6 +1,5 @@
 import 'package:expenditure/models/user.dart';
 import 'package:expenditure/screens/add_new/add_new_expenditure.dart';
-// import 'package:expenditure/screens/search/search_expenditure.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -53,10 +52,6 @@ class _MyNavigatorState extends State<MyNavigator> {
       activeIcon: Icon(Icons.home),
       label: 'Home',
     ),
-    // BottomNavigationBarItem(
-    //   icon: Icon(Icons.search),
-    //   label: 'Search',
-    // ),
     BottomNavigationBarItem(
       icon: Icon(Icons.add),
       activeIcon: Icon(Icons.add_circle),
