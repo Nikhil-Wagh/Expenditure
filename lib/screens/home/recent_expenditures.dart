@@ -1,6 +1,7 @@
 import 'package:expenditure/models/expenditure.dart';
 import 'package:expenditure/services/database.dart';
 import 'package:flutter/material.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class RecentExpenditures extends StatelessWidget {
   final int selectedExpenditureIndex;
@@ -23,7 +24,7 @@ class RecentExpenditures extends StatelessWidget {
             children: [
               _RecentExpendituresHeader(),
               SizedBox(height: 10),
-              _ListExpenditures(
+              ListExpenditures(
                 selectedIndex: selectedExpenditureIndex,
                 expenditures: expenditures,
               ),
@@ -35,16 +36,34 @@ class RecentExpenditures extends StatelessWidget {
   }
 }
 
-class _ListExpenditures extends StatefulWidget {
+class ListExpenditures extends StatefulWidget {
   int selectedIndex;
   final List<Expenditure> expenditures;
-  _ListExpenditures({this.selectedIndex, this.expenditures});
+  final bool shouldScroll;
+  ListExpenditures({
+    this.selectedIndex,
+    this.expenditures,
+    this.shouldScroll = true,
+  });
 
   @override
   _ListExpendituresState createState() => _ListExpendituresState();
 }
 
-class _ListExpendituresState extends State<_ListExpenditures> {
+class _ListExpendituresState extends State<ListExpenditures> {
+  ItemScrollController _scrollController = ItemScrollController();
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.shouldScroll)
+        _scrollController.scrollTo(
+          index: widget.selectedIndex,
+          duration: Duration(milliseconds: 500),
+        );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.expenditures == null) {
@@ -60,8 +79,8 @@ class _ListExpendituresState extends State<_ListExpenditures> {
     return Expanded(
       child: Container(
         child: NotificationListener<ExpenditureSelectedNotification>(
-          child: ListView.builder(
-            shrinkWrap: true,
+          child: ScrollablePositionedList.builder(
+            itemScrollController: _scrollController,
             itemCount: widget.expenditures.length,
             itemBuilder: (context, index) {
               print('[info] _ListExpendituresState.ListView'
@@ -109,7 +128,12 @@ class _ListExpendituresState extends State<_ListExpenditures> {
             debugPrint('[debug] RecentExpenditure.ListExpenditureState got '
                 'notification selectedIndex = ${notification.selectedIndex}');
             setState(() {
-              widget.selectedIndex = notification.selectedIndex;
+              int selectedIndex = notification.selectedIndex;
+              widget.selectedIndex = selectedIndex;
+              // _scrollController.scrollTo(
+              //   index: selectedIndex,
+              //   duration: Duration(milliseconds: 500),
+              // );
             });
             return false; // Send up the tree
           },
@@ -147,96 +171,99 @@ class _ListItemExpenditure extends StatefulWidget {
 }
 
 class _ListItemExpenditureState extends State<_ListItemExpenditure> {
+  static const _borderRadius = BorderRadius.all(Radius.circular(10));
+  static const _cardBorder = RoundedRectangleBorder(
+    borderRadius: _borderRadius,
+  );
+
   @override
   Widget build(BuildContext context) {
-    final _cardBorder = RoundedRectangleBorder(
-      borderRadius: BorderRadius.all(Radius.circular(10)),
-    );
-
-    return AnimatedContainer(
-      duration: Duration(milliseconds: 200),
-      child: Card(
-        shape: _cardBorder,
-        color: (widget.selected == true) ? Colors.indigo : Colors.blue[400],
-        child: InkWell(
-          customBorder: _cardBorder,
-          onTap: () {
-            setState(() {
-              ExpenditureSelectedNotification(
-                selectedIndex: widget.id,
-              ).dispatch(context);
-            });
-            print('[info] ListItemExpenditure tapped');
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Icon(
-                      Icons.shopping_cart,
-                      color: Colors.white,
+    return Card(
+      margin: EdgeInsets.all(4),
+      shape: _cardBorder,
+      child: InkWell(
+        customBorder: _cardBorder,
+        onTap: () {
+          setState(() {
+            ExpenditureSelectedNotification(
+              selectedIndex: widget.id,
+            ).dispatch(context);
+          });
+          print('[info] ListItemExpenditure tapped');
+        },
+        child: Ink(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+          decoration: BoxDecoration(
+            color: (widget.selected == true) ? Colors.indigo : Colors.blue[400],
+            border: Border.all(color: Colors.black, width: 3),
+            borderRadius: _borderRadius,
+          ),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Icon(
+                    Icons.shopping_cart,
+                    color: Colors.white,
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      widget.expenditure.description,
+                      style: TextStyle(color: Colors.white),
+                      softWrap: true,
                     ),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        widget.expenditure.description,
-                        style: TextStyle(color: Colors.white),
-                        softWrap: true,
-                      ),
-                    ),
-                    SizedBox(width: 20),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(2.0),
-                          // child: ,
-                          child: Text(
-                            "Rs ",
-                            // expenditure.amount.currency.format(expenditure.amount),
-                            // expenditure.currency,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          widget.expenditure.amount.toString(),
+                  ),
+                  SizedBox(width: 20),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        // child: ,
+                        child: Text(
+                          "Rs ",
+                          // expenditure.amount.currency.format(expenditure.amount),
+                          // expenditure.currency,
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 20,
+                            fontSize: 10,
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      // TODO:
-                      // These take values that are not in database,
-                      // which is incorrect
-                      // They should be assigned default values by model or database
-                      widget.expenditure.timestampToString(),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontStyle: FontStyle.italic,
-                        fontSize: 12,
                       ),
+                      Text(
+                        widget.expenditure.amount.toString(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    // TODO:
+                    // These take values that are not in database,
+                    // which is incorrect
+                    // They should be assigned default values by model or database
+                    widget.expenditure.timestampToString(),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontStyle: FontStyle.italic,
+                      fontSize: 12,
                     ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),

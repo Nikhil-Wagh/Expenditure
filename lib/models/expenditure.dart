@@ -35,6 +35,14 @@ class Expenditure {
   double get amount {
     return _amount.toDouble();
   }
+
+  contains(String query) {
+    if (amount.toString().contains(query)) return true;
+    if (description.toLowerCase().contains(query)) return true;
+    if (timestampToString().toLowerCase().contains(query)) return true;
+
+    return false;
+  }
 }
 
 class Amount {
