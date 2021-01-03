@@ -1,14 +1,17 @@
 import 'package:expenditure/models/expenditure.dart';
 import 'package:expenditure/services/database.dart';
+import 'package:expenditure/utils/expenditure_selected_notification.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class RecentExpenditures extends StatelessWidget {
   final int selectedExpenditureIndex;
   final List<Expenditure> expenditures;
+  final bool shouldScroll;
   RecentExpenditures({
     @required this.selectedExpenditureIndex,
     @required this.expenditures,
+    this.shouldScroll = true,
   });
 
   @override
@@ -39,12 +42,15 @@ class RecentExpenditures extends StatelessWidget {
 class ListExpenditures extends StatefulWidget {
   int selectedIndex;
   final List<Expenditure> expenditures;
-  final bool shouldScroll;
   ListExpenditures({
-    this.selectedIndex,
-    this.expenditures,
-    this.shouldScroll = true,
-  });
+    @required this.selectedIndex,
+    @required this.expenditures,
+  }) {
+    assert(
+        expenditures != null,
+        'ListExpenditures received a null for '
+        'expenditures, it should be a list');
+  }
 
   @override
   _ListExpendituresState createState() => _ListExpendituresState();
@@ -55,29 +61,24 @@ class _ListExpendituresState extends State<ListExpenditures> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.shouldScroll)
-        _scrollController.scrollTo(
-          index: widget.selectedIndex,
-          duration: Duration(milliseconds: 500),
-        );
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   if (widget.shouldScroll)
+    //     _scrollController.scrollTo(
+    //       index: widget.selectedIndex,
+    //       duration: Duration(milliseconds: 500),
+    //     );
+    // });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.expenditures == null) {
-      // TODO: Show a loading widget
-      return Text("Still Loading .. Please wait");
-    }
-
     print('[debug] _ListExpenditureState.build'
         '.expenditures.length = ${widget.expenditures.length}');
     print('[debug] _ListExpenditureState.build'
         '.selectedIndex = ${widget.selectedIndex}');
 
-    return Expanded(
-      child: Container(
+    return Container(
+      child: Expanded(
         child: NotificationListener<ExpenditureSelectedNotification>(
           child: ScrollablePositionedList.builder(
             itemScrollController: _scrollController,
@@ -130,10 +131,10 @@ class _ListExpendituresState extends State<ListExpenditures> {
             setState(() {
               int selectedIndex = notification.selectedIndex;
               widget.selectedIndex = selectedIndex;
-              // _scrollController.scrollTo(
-              //   index: selectedIndex,
-              //   duration: Duration(milliseconds: 500),
-              // );
+              _scrollController.scrollTo(
+                index: selectedIndex,
+                duration: Duration(milliseconds: 500),
+              );
             });
             return false; // Send up the tree
           },
@@ -184,12 +185,12 @@ class _ListItemExpenditureState extends State<_ListItemExpenditure> {
       child: InkWell(
         customBorder: _cardBorder,
         onTap: () {
+          print('[info] ListItemExpenditure tapped');
           setState(() {
             ExpenditureSelectedNotification(
               selectedIndex: widget.id,
             ).dispatch(context);
           });
-          print('[info] ListItemExpenditure tapped');
         },
         child: Ink(
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
@@ -281,13 +282,5 @@ class _RecentExpendituresHeader extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
     );
-  }
-}
-
-class ExpenditureSelectedNotification extends Notification {
-  final int selectedIndex;
-
-  ExpenditureSelectedNotification({this.selectedIndex}) {
-    print('[debug] SelectedNotification generated with index = $selectedIndex');
   }
 }

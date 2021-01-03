@@ -2,6 +2,7 @@ import 'package:expenditure/models/expenditure.dart';
 import 'package:expenditure/models/user.dart';
 import 'package:expenditure/screens/home/recent_expenditures.dart';
 import 'package:expenditure/services/auth.dart';
+import 'package:expenditure/utils/expenditure_selected_notification.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,7 +17,9 @@ class HomeScreenAppBar extends StatelessWidget {
     final String displayName = user.displayName;
     final String photoURL = user.photoURL;
 
-    final List<Expenditure> expenditures = Provider.of<List<Expenditure>>(context);
+    final List<Expenditure> expenditures = Provider.of<List<Expenditure>>(
+      context,
+    );
 
     return Container(
       padding: EdgeInsets.all(10.0),
@@ -45,18 +48,18 @@ class HomeScreenAppBar extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "Welcome",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  displayName,
-                  style: TextStyle(fontSize: 24, color: Colors.black, fontWeight: FontWeight.bold),
-                )
+                Text("Welcome",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.bold,
+                    )),
+                Text(displayName,
+                    style: TextStyle(
+                      fontSize: 24,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ))
               ],
             ),
           ),
@@ -137,7 +140,6 @@ class CustomSearchDelegate extends SearchDelegate<Expenditure> {
           child: ListExpenditures(
             selectedIndex: -1,
             expenditures: suggestionList,
-            shouldScroll: false,
           )),
     );
   }
