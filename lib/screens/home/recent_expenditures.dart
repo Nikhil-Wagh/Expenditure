@@ -134,6 +134,7 @@ class _ListExpendituresState extends State<ListExpenditures> {
               _scrollController.scrollTo(
                 index: selectedIndex,
                 duration: Duration(milliseconds: 500),
+                curve: Curves.decelerate,
               );
             });
             return false; // Send up the tree
