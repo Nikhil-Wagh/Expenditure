@@ -1,44 +1,23 @@
-import 'package:expenditure/models/user.dart';
-import 'package:expenditure/screens/add_new/add_new_expenditure.dart';
+import 'package:expenditure/models/expenditures.dart';
+import 'package:expenditure/screens/analytics/analytics.dart';
+import 'package:expenditure/screens/crud_expenditure/add_new_expenditure.dart';
+import 'package:expenditure/screens/home/home.dart';
+import 'package:expenditure/screens/settings/settings.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-import 'analytics/analytics.dart';
-import 'authenticate/authenticate.dart';
-import 'home/home.dart';
-import 'settings/settings.dart';
-
-class Wrapper extends StatelessWidget {
+class AppNavigator extends StatefulWidget {
+  AppNavigator();
   @override
-  Widget build(BuildContext context) {
-    debugPrint('[info] Wrapper.build called');
-    final user = Provider.of<User>(context);
-
-    if (user != null) {
-      return MyNavigator(user: user);
-    } else {
-      return Authenticate();
-    }
-  }
+  _AppNavigatorState createState() => _AppNavigatorState();
 }
 
-// Rename this, this is the AfterLoginApp
-class MyNavigator extends StatefulWidget {
-  final User user;
-
-  MyNavigator({this.user});
-
-  @override
-  _MyNavigatorState createState() => _MyNavigatorState();
-}
-
-class _MyNavigatorState extends State<MyNavigator> {
+class _AppNavigatorState extends State<AppNavigator> {
   final List<Widget> _screens = <Widget>[];
 
   @override
   void initState() {
     super.initState();
-    _screens.add(Home(user: widget.user));
+    _screens.add(Home());
     _screens.add(AddNewExpenditure());
     _screens.add(Analytics());
     _screens.add(Settings());
@@ -72,16 +51,18 @@ class _MyNavigatorState extends State<MyNavigator> {
   @override
   Widget build(BuildContext context) {
     debugPrint('[info] MyNavigator.build called');
-    return Scaffold(
-      // FIX ME: IndexedStack will have performance issues
-      // This will have longer load times
-      body: IndexedStack(
-        children: _screens,
-        index: _selectedScreenIndex,
+    return SafeArea(
+      child: Scaffold(
+        // FIX ME: IndexedStack will have performance issues
+        // This will have longer load times
+        // body: IndexedStack(
+        //   children: _screens,
+        //   index: _selectedScreenIndex,
+        // ),
+        body: _screens[_selectedScreenIndex],
+        backgroundColor: Colors.white,
+        bottomNavigationBar: _buildBottomNavigationBar(),
       ),
-      // body: _screens[_selectedScreenIndex],
-      backgroundColor: Colors.white,
-      bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
 

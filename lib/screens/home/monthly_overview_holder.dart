@@ -1,21 +1,13 @@
 import 'package:expenditure/constants.dart';
-import 'package:expenditure/models/expenditure.dart';
+import 'package:expenditure/models/expenditure_item.dart';
+import 'package:expenditure/models/expenditures.dart';
 import 'package:expenditure/models/monthly_overview.dart';
 import 'package:expenditure/utils.dart';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class MonthlyOverviewHolder extends StatefulWidget {
-  // https://stackoverflow.com/a/43791071/6890234
-  // Instead of passing arguments to children widgets
-  final int selectedExpenditureIndex;
-  final List<Expenditure> expenditures;
-
-  MonthlyOverviewHolder({@required this.selectedExpenditureIndex, @required this.expenditures}) {
-    debugPrint('[debug] MonthlyOverviewHolder.selectedExpenditureIndex = '
-        '$selectedExpenditureIndex');
-  }
-
   @override
   _MonthlyOverviewHolderState createState() => _MonthlyOverviewHolderState();
 }
@@ -23,18 +15,17 @@ class MonthlyOverviewHolder extends StatefulWidget {
 class _MonthlyOverviewHolderState extends State<MonthlyOverviewHolder> {
   @override
   Widget build(BuildContext context) {
-    // final List<Expenditure> expenditures = Provider.of<List<Expenditure>>(
-    //   context,
-    // );
+    final Expenditures expenditures = Provider.of<Expenditures>(context);
+    assert(expenditures != null);
 
-    if (widget.expenditures == null) {
-      return Text('Still loading .. Please wait');
+    if (expenditures.isEmpty) {
+      // TODO: Return a proper Container
+      return Container(
+        child: Text("No Expenditures added yet"),
+      );
     }
 
-    MonthlyOverview _monthlyOverview = _getMonthlyOverviewBefore(
-      widget.selectedExpenditureIndex,
-      widget.expenditures,
-    );
+    MonthlyOverview _monthlyOverview = _getMonthlyOverview(expenditures);
     return Container(
       width: MediaQuery.of(context).size.width,
       constraints: BoxConstraints(minHeight: 150),
@@ -65,43 +56,39 @@ class _MonthlyOverviewHolderState extends State<MonthlyOverviewHolder> {
     );
   }
 
-  MonthlyOverview _getMonthlyOverviewBefore(
-    int index,
-    List<Expenditure> expenditures,
-  ) {
+  MonthlyOverview _getMonthlyOverview(Expenditures expenditures) {
     // FIX ME: throws error when expenditures is empty
     // datetime should come from date.now() or if index >= 0
+
+    Expenditure _selectedExpenditure = expenditures.items.firstWhere((expenditure) => expenditure.ref == expenditures.selectedExpenditureRef);
+
     DateTime selectedExpenditureMonthDateTime;
-    if (expenditures.isEmpty || index >= expenditures.length)
-      selectedExpenditureMonthDateTime = DateTime.now();
-    else {
-      Expenditure selectedExpenditure = expenditures[index];
-      selectedExpenditureMonthDateTime = Utils.dateFromTimestamp(
-        selectedExpenditure.timestamp,
-      );
-    }
+
+    selectedExpenditureMonthDateTime = Utils.dateFromTimestamp(
+      _selectedExpenditure.timestamp,
+    );
 
     int selectedExpenditureMonth = selectedExpenditureMonthDateTime.month;
     int selectedExpenditureYear = selectedExpenditureMonthDateTime.year;
 
-    // TODO: Fix me, income would come from a static doc
+    // FIXME: income would come from a static doc
     double income = 1000000;
     double expenses = 0;
 
     // index 0 is the latest expenditure
-    for (int i = index; i < expenditures.length; i++) {
+    expenditures.items.where((expenditure) => (expenditure.timestamp.compareTo(_selectedExpenditure.timestamp) <= 0)).forEach((item) {
       DateTime currentExpenditureMonthDateTime = Utils.dateFromTimestamp(
-        expenditures[i].timestamp,
+        item.timestamp,
       );
       int currentMonth = currentExpenditureMonthDateTime.month;
       int currentYear = currentExpenditureMonthDateTime.year;
       // comparing with currentMonth is also fine
       if (currentMonth != selectedExpenditureMonth || currentYear != selectedExpenditureYear) {
-        break;
+        return;
       }
 
-      expenses += expenditures[i].amount;
-    }
+      expenses += item.amount;
+    });
 
     return MonthlyOverview(
       expenses: expenses,

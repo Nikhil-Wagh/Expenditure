@@ -2,7 +2,7 @@ class InputValidator {
   /*
   Static functions to validate inputs from the user
   Every function should be of return type String and accept a String parameter
-  
+
   Returns: Either null i.e No error,
   Or a String containing the error itself
   */

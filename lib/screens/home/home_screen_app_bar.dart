@@ -1,25 +1,24 @@
-import 'package:expenditure/models/expenditure.dart';
+import 'package:expenditure/constants.dart';
+import 'package:expenditure/models/expenditure_item.dart';
+import 'package:expenditure/models/expenditures.dart';
 import 'package:expenditure/models/user.dart';
-import 'package:expenditure/screens/home/recent_expenditures.dart';
+import 'package:expenditure/screens/home/list_item_expenditure.dart';
 import 'package:expenditure/services/auth.dart';
-import 'package:expenditure/utils/expenditure_selected_notification.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreenAppBar extends StatelessWidget {
-  final User user;
-  HomeScreenAppBar({@required this.user});
+  static const TAG = 'HomeScreenAppBar';
 
   @override
   Widget build(BuildContext context) {
+    final User user = Provider.of<User>(context);
+    final Expenditures expenditures = Provider.of<Expenditures>(context);
+
     assert(user != null, 'No user provided to HomeScreenAppBar');
 
     final String displayName = user.displayName;
     final String photoURL = user.photoURL;
-
-    final List<Expenditure> expenditures = Provider.of<List<Expenditure>>(
-      context,
-    );
 
     return Container(
       padding: EdgeInsets.all(10.0),
@@ -48,20 +47,27 @@ class HomeScreenAppBar extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Welcome",
+                Text(welcome,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 12,
                       color: Colors.grey,
                       fontWeight: FontWeight.bold,
                     )),
                 Text(displayName,
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 30,
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
                     ))
               ],
             ),
+          ),
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () {
+              debugPrint("Sign out button pressed");
+              AuthService().signOut();
+            },
           ),
           IconButton(
             icon: Icon(
@@ -70,6 +76,7 @@ class HomeScreenAppBar extends StatelessWidget {
             ),
             onPressed: () => showSearch(
               context: context,
+              // FIXME: This doesn't updates on item select
               delegate: CustomSearchDelegate(expenditures: expenditures),
             ),
           )
@@ -77,28 +84,23 @@ class HomeScreenAppBar extends StatelessWidget {
       ),
     );
   }
-
-  choicesAction(value) {
-    switch (value) {
-      case "Logout":
-        AuthService().signOut();
-    }
-  }
 }
 
 class CustomSearchDelegate extends SearchDelegate<Expenditure> {
-  final List<Expenditure> expenditures;
+  final Expenditures expenditures;
 
   CustomSearchDelegate({this.expenditures});
-
-  int selectedIndex = 0;
+  static const String TAG = 'CustomSearchDelegate';
 
   @override
   List<Widget> buildActions(BuildContext context) {
     return <Widget>[
       IconButton(
         icon: Icon(Icons.clear),
-        onPressed: () => query = '',
+        onPressed: () {
+          if (query.isEmpty) close(context, null);
+          query = '';
+        },
       )
     ];
   }
@@ -113,34 +115,35 @@ class CustomSearchDelegate extends SearchDelegate<Expenditure> {
 
   @override
   Widget buildResults(BuildContext context) {
-    return Container(
-      child: Center(child: Text(expenditures[selectedIndex].description)),
-    );
+    // Just close the search bar as selectedExpenditureRef is updated
+    debugPrint('[debug] $TAG, buildResults called. Closing Search');
+    close(context, null);
+    return Container(); // This is never shown, we close search on selection
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    List<Expenditure> suggestionList = [];
-    debugPrint('[info] building suggestions');
-    query.isEmpty
-        ? suggestionList = expenditures
-        : suggestionList.addAll(
-            expenditures.where((element) => element.contains(
-                  query.toLowerCase(),
-                )),
-          );
-
+    List<Expenditure> listExpenditures = expenditures.items.where((item) => item.toString().toLowerCase().contains(query.toLowerCase())).toList();
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: NotificationListener<ExpenditureSelectedNotification>(
-          onNotification: (notification) {
-            close(context, expenditures[notification.selectedIndex]);
-            return true;
+      child: Container(
+        child: ListView.builder(
+          itemCount: listExpenditures.length,
+          itemBuilder: (context, index) {
+            debugPrint('[debug] $TAG.ListViewBuilder for expenditure: ${listExpenditures[index].toString()}');
+            return ListItemExpenditure(
+              id: index,
+              expenditure: listExpenditures[index],
+              selected: false,
+              onTapHandler: (Expenditure selectedExpenditure) {
+                debugPrint('[debug] $TAG.onTapHandler called for expenditure ' + selectedExpenditure.toString());
+                expenditures.select(selectedExpenditure);
+                close(context, null);
+              },
+            );
           },
-          child: ListExpenditures(
-            selectedIndex: -1,
-            expenditures: suggestionList,
-          )),
+        ),
+      ),
     );
   }
 }

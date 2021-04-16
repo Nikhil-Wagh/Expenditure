@@ -1,8 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class User {
   String uid, email, displayName, phoneNumber;
   String photoURL;
+  bool isLoggedIn;
 
   User({
     this.uid,
@@ -10,6 +9,7 @@ class User {
     this.displayName,
     this.phoneNumber,
     this.photoURL,
+    this.isLoggedIn = false,
   });
 
   Map<String, dynamic> toMap() {
@@ -18,7 +18,8 @@ class User {
       'email': this.email,
       'displayName': this.displayName,
       'phoneNumber': this.phoneNumber,
-      'photoURL': this.photoURL
+      'photoURL': this.photoURL,
+      'isLoggedIn': this.isLoggedIn
     };
   }
 }
