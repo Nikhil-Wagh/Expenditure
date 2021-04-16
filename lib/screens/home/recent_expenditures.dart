@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expenditure/models/expenditure_item.dart';
 import 'package:expenditure/models/expenditures.dart';
 import 'package:expenditure/services/database.dart';
@@ -47,7 +46,7 @@ class ListExpenditures extends StatefulWidget {
 class _ListExpendituresState extends State<ListExpenditures> {
   static const String TAG = 'ListExpendituresState';
 
-  ItemScrollController _scrollController = ItemScrollController();
+  ItemScrollController _scrollController;
 
   Expenditures expenditures;
 
@@ -55,6 +54,7 @@ class _ListExpendituresState extends State<ListExpenditures> {
   Widget build(BuildContext context) {
     // Loading expenditures
     expenditures = Provider.of<Expenditures>(context);
+    _scrollController = Provider.of<ItemScrollController>(context);
 
     print('[debug] $TAG.build'
         '.expenditures.length = ${expenditures.length}');

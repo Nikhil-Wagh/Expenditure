@@ -1,4 +1,3 @@
-import 'package:expenditure/models/expenditures.dart';
 import 'package:expenditure/screens/analytics/analytics.dart';
 import 'package:expenditure/screens/crud_expenditure/add_new_expenditure.dart';
 import 'package:expenditure/screens/home/home.dart';
@@ -53,12 +52,6 @@ class _AppNavigatorState extends State<AppNavigator> {
     debugPrint('[info] MyNavigator.build called');
     return SafeArea(
       child: Scaffold(
-        // FIX ME: IndexedStack will have performance issues
-        // This will have longer load times
-        // body: IndexedStack(
-        //   children: _screens,
-        //   index: _selectedScreenIndex,
-        // ),
         body: _screens[_selectedScreenIndex],
         backgroundColor: Colors.white,
         bottomNavigationBar: _buildBottomNavigationBar(),

@@ -1,5 +1,6 @@
 import 'package:expenditure/models/expenditure_item.dart';
 import 'package:flutter/material.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 // TODO: Make this a stateless widget
 class ListItemExpenditure extends StatefulWidget {

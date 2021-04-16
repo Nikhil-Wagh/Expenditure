@@ -40,6 +40,10 @@ class Expenditures extends ChangeNotifier {
     return _items[index];
   }
 
+  int get count {
+    return _items.length;
+  }
+
   void removeAt(int index) {
     _items.removeAt(index);
   }

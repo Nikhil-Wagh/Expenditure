@@ -6,6 +6,7 @@ import 'package:expenditure/screens/home/list_item_expenditure.dart';
 import 'package:expenditure/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class HomeScreenAppBar extends StatelessWidget {
   static const TAG = 'HomeScreenAppBar';
@@ -14,6 +15,7 @@ class HomeScreenAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final User user = Provider.of<User>(context);
     final Expenditures expenditures = Provider.of<Expenditures>(context);
+    final ItemScrollController scrollController = Provider.of<ItemScrollController>(context);
 
     assert(user != null, 'No user provided to HomeScreenAppBar');
 
@@ -77,7 +79,7 @@ class HomeScreenAppBar extends StatelessWidget {
             onPressed: () => showSearch(
               context: context,
               // FIXME: This doesn't updates on item select
-              delegate: CustomSearchDelegate(expenditures: expenditures),
+              delegate: CustomSearchDelegate(expenditures: expenditures, scrollController: scrollController),
             ),
           )
         ],
@@ -88,8 +90,9 @@ class HomeScreenAppBar extends StatelessWidget {
 
 class CustomSearchDelegate extends SearchDelegate<Expenditure> {
   final Expenditures expenditures;
+  final ItemScrollController scrollController;
 
-  CustomSearchDelegate({this.expenditures});
+  CustomSearchDelegate({this.expenditures, this.scrollController});
   static const String TAG = 'CustomSearchDelegate';
 
   @override
@@ -124,6 +127,7 @@ class CustomSearchDelegate extends SearchDelegate<Expenditure> {
   @override
   Widget buildSuggestions(BuildContext context) {
     List<Expenditure> listExpenditures = expenditures.items.where((item) => item.toString().toLowerCase().contains(query.toLowerCase())).toList();
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Container(
@@ -139,6 +143,10 @@ class CustomSearchDelegate extends SearchDelegate<Expenditure> {
                 debugPrint('[debug] $TAG.onTapHandler called for expenditure ' + selectedExpenditure.toString());
                 expenditures.select(selectedExpenditure);
                 close(context, null);
+                scrollController.scrollTo(
+                  index: expenditures.indexOf(selectedExpenditure.ref),
+                  duration: Duration(milliseconds: 600),
+                );
               },
             );
           },
