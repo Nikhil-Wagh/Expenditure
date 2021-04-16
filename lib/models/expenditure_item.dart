@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class Expenditure {
+// TODO: rename to ExpenditureItem
+class Expenditure extends ChangeNotifier {
   DocumentReference ref;
   Amount _amount;
   String description, mode;
@@ -17,9 +19,13 @@ class Expenditure {
     return DateFormat.MMMd().addPattern(', ').add_jm().format(timestamp.toDate());
   }
 
-  String toString() {
+  String toStringDebug() {
     return '[ ref = $ref, amount = $amount, description $description, '
         'mode = $mode, timestamp = $timestamp ]';
+  }
+
+  String toString() {
+    return '$amount, $description, $mode, ${timestampToString()}';
   }
 
   Map<String, dynamic> toMap() {
@@ -34,6 +40,14 @@ class Expenditure {
 
   double get amount {
     return _amount.toDouble();
+  }
+
+  contains(String query) {
+    if (amount.toString().contains(query)) return true;
+    if (description.toLowerCase().contains(query)) return true;
+    if (timestampToString().toLowerCase().contains(query)) return true;
+
+    return false;
   }
 }
 

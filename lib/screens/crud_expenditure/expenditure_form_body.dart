@@ -1,80 +1,39 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:expenditure/constants.dart';
-import 'package:expenditure/models/expenditure.dart';
+import 'package:expenditure/models/expenditure_item.dart';
 import 'package:expenditure/services/database.dart';
 import 'package:expenditure/utils/input_validator.dart';
+import 'package:flutter/foundation.dart';
+import 'mode_item.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
+// For DateFormat
 import 'package:intl/intl.dart';
 
-class AddNewExpenditure extends StatefulWidget {
+class ExpenditureFormBody extends StatefulWidget {
+  final Expenditure expenditure;
+
+  ExpenditureFormBody({this.expenditure});
+
   @override
-  _AddNewExpenditureState createState() => _AddNewExpenditureState();
+  _ExpenditureFormBodyState createState() => _ExpenditureFormBodyState();
 }
 
-class _AddNewExpenditureState extends State<AddNewExpenditure> {
-  @override
-  Widget build(BuildContext context) {
-    debugPrint('[info] AddNewExpenditure.build called');
-    return Container(
-        padding: EdgeInsets.only(left: mMargin, right: mMargin, top: mMargin),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            AddNexExpenditureAppBar(),
-            AddNewExpenditureBody()
-          ],
-        ));
-  }
-}
+class _ExpenditureFormBodyState extends State<ExpenditureFormBody> {
+  static const String TAG = 'ExpenditureFormBodyState';
 
-class AddNexExpenditureAppBar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      padding: EdgeInsets.all(24.0),
-      child: Stack(
-        children: [
-          Icon(
-            Icons.arrow_back,
-            size: 24.0,
-          ),
-          // SizedBox(width: 16),
-          Center(
-              child: Text(
-            'Add New Expenditure',
-            style: TextStyle(
-              fontSize: 24,
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
-          ))
-        ],
-      ),
-    );
-  }
-}
-
-class AddNewExpenditureBody extends StatefulWidget {
-  @override
-  _AddNewExpenditureBodyState createState() => _AddNewExpenditureBodyState();
-}
-
-class _AddNewExpenditureBodyState extends State<AddNewExpenditureBody> {
   final GlobalKey<FormState> _addNewExpenditureFormKey = GlobalKey<FormState>();
 
   double _amount;
   Timestamp _timestamp = Timestamp.now();
   String _description;
-  Item _mode;
+  ModeItem _mode;
   // Geolocation _location;
 
-  List<Item> _modeItems = [];
+  List<ModeItem> _modeItems = [];
 
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
@@ -84,11 +43,23 @@ class _AddNewExpenditureBodyState extends State<AddNewExpenditureBody> {
           ));
 
   @override
+  void initState() {
+    if (widget.expenditure != null) {
+      debugPrint('[info] Edit Expenditure called: ${widget.expenditure}');
+      debugPrint('[debug] Building Timestamp Controller with initial data = '
+          '${widget.expenditure.timestamp}');
+
+      _dateTimeFieldController.text = widget.expenditure.timestampToString();
+    }
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    debugPrint('[debug] building AddNewExpenditureBody');
+    debugPrint('[debug] building $TAG');
     if (_modeItems.isEmpty) {
       for (Map mode in PAYMENT_MODES) {
-        _modeItems.add(Item(name: mode['name'], icon: mode['icon']));
+        _modeItems.add(ModeItem(name: mode['name'], icon: mode['icon']));
       }
       _mode = _modeItems.first;
     }
@@ -131,6 +102,7 @@ class _AddNewExpenditureBodyState extends State<AddNewExpenditureBody> {
           _amount = double.parse(newValue.trim());
         },
         autovalidateMode: AutovalidateMode.onUserInteraction,
+        initialValue: widget.expenditure != null ? widget.expenditure.amount.toString() : '',
       ),
     );
   }
@@ -151,6 +123,7 @@ class _AddNewExpenditureBodyState extends State<AddNewExpenditureBody> {
         },
         maxLines: 3,
         minLines: 1,
+        initialValue: widget.expenditure != null ? widget.expenditure.description : '',
       ),
     );
   }
@@ -176,13 +149,13 @@ class _AddNewExpenditureBodyState extends State<AddNewExpenditureBody> {
   Widget _buildModeField() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: DropdownButtonFormField<Item>(
+      child: DropdownButtonFormField<ModeItem>(
         decoration: InputDecoration(
           border: OutlineInputBorder(),
           labelText: 'Payment Mode',
         ),
         items: _modeItems.map((item) {
-          return DropdownMenuItem<Item>(
+          return DropdownMenuItem<ModeItem>(
             value: item,
             child: Row(
               children: [
@@ -223,7 +196,8 @@ class _AddNewExpenditureBodyState extends State<AddNewExpenditureBody> {
     }
 
     _addNewExpenditureFormKey.currentState.save();
-    // _addNewExpenditureFormKey.currentState.
+
+    debugPrint('$TAG._onSavePressed called');
 
     Expenditure newExpenditure = Expenditure(
       amount: _amount,
@@ -231,15 +205,21 @@ class _AddNewExpenditureBodyState extends State<AddNewExpenditureBody> {
       mode: _mode.name,
       timestamp: _timestamp,
     );
-
-    debugPrint('AddNewExpenditure._onSavePressed called');
-    debugPrint('AddNewExpenditure._onSavePressed.newExpenditure = '
+    debugPrint('$TAG._onSavePressed.newExpenditure = '
         '${newExpenditure.toString()}');
-    Future<DocumentReference> addedDocRef = DatabaseService.addNewExpenditure(
-      newExpenditure,
-    );
 
-    addedDocRef.then((_) {
+    Future<DocumentReference> savedDocRef;
+
+    if (widget.expenditure != null) {
+      savedDocRef = DatabaseService.updateExpenditure(
+        widget.expenditure,
+        newExpenditure,
+      );
+    } else {
+      savedDocRef = DatabaseService.addNewExpenditure(newExpenditure);
+    }
+
+    savedDocRef.then((_) {
       debugPrint('[info] AddNewExpenditure._onSavePressed :: '
           'Saved new expenditure successfully');
       debugPrint('[info] AddNewExpenditure._onSavePressed :: Resetting fields');
@@ -316,15 +296,9 @@ class _AddNewExpenditureBodyState extends State<AddNewExpenditureBody> {
       selectedTime.minute,
     );
     _timestamp = Timestamp.fromDate(_selectedDateTime);
+    debugPrint('[debug] $TAG, setting selected DataTime = $_selectedDateTime');
     _dateTimeFieldController.text = DateFormat.yMMMMd().add_jm().format(
           _selectedDateTime,
         );
   }
-}
-
-class Item {
-  final String name;
-  final IconData icon;
-
-  Item({this.name, this.icon});
 }

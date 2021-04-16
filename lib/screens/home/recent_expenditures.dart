@@ -1,14 +1,14 @@
-import 'package:expenditure/models/expenditure.dart';
+import 'package:expenditure/models/expenditure_item.dart';
+import 'package:expenditure/models/expenditures.dart';
 import 'package:expenditure/services/database.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+
+import 'list_item_expenditure.dart';
 
 class RecentExpenditures extends StatelessWidget {
-  final int selectedExpenditureIndex;
-  final List<Expenditure> expenditures;
-  RecentExpenditures({
-    @required this.selectedExpenditureIndex,
-    @required this.expenditures,
-  });
+  static const String TAG = 'RecentExpenditures';
 
   @override
   Widget build(BuildContext context) {
@@ -23,10 +23,7 @@ class RecentExpenditures extends StatelessWidget {
             children: [
               _RecentExpendituresHeader(),
               SizedBox(height: 10),
-              _ListExpenditures(
-                selectedIndex: selectedExpenditureIndex,
-                expenditures: expenditures,
-              ),
+              ListExpenditures(),
             ],
           ),
         ),
@@ -35,86 +32,78 @@ class RecentExpenditures extends StatelessWidget {
   }
 }
 
-class _ListExpenditures extends StatefulWidget {
-  int selectedIndex;
-  final List<Expenditure> expenditures;
-  _ListExpenditures({this.selectedIndex, this.expenditures});
+class ListExpenditures extends StatefulWidget {
+  /*
+   * It should load the list of expenditures and create individual element
+   * from ListItemExpenditure, this will also specify the onTapHandler for
+   * ListItemExpenditure and Dismissible.
+   */
 
   @override
   _ListExpendituresState createState() => _ListExpendituresState();
 }
 
-class _ListExpendituresState extends State<_ListExpenditures> {
+class _ListExpendituresState extends State<ListExpenditures> {
+  static const String TAG = 'ListExpendituresState';
+
+  ItemScrollController _scrollController;
+
+  Expenditures expenditures;
+
   @override
   Widget build(BuildContext context) {
-    if (widget.expenditures == null) {
-      // TODO: Show a loading widget
-      return Text("Still Loading .. Please wait");
-    }
+    // Loading expenditures
+    expenditures = Provider.of<Expenditures>(context);
+    _scrollController = Provider.of<ItemScrollController>(context);
 
-    print('[debug] _ListExpenditureState.build'
-        '.expenditures.length = ${widget.expenditures.length}');
-    print('[debug] _ListExpenditureState.build'
-        '.selectedIndex = ${widget.selectedIndex}');
+    print('[debug] $TAG.build'
+        '.expenditures.length = ${expenditures.length}');
+    print('[debug] $TAG.build'
+        '.selectedIndex = ${expenditures.selectedExpenditureRef}');
 
-    return Expanded(
-      child: Container(
-        child: NotificationListener<ExpenditureSelectedNotification>(
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: widget.expenditures.length,
-            itemBuilder: (context, index) {
-              print('[info] _ListExpendituresState.ListView'
-                  '.builder.itemBuilder called on index = $index');
+    return Container(
+      child: Expanded(
+        child: ScrollablePositionedList.builder(
+          itemScrollController: _scrollController,
+          itemCount: expenditures.length,
+          itemBuilder: (context, index) {
+            print('[info] _ListExpendituresState.ListView'
+                '.builder.itemBuilder called on index = $index');
 
-              return Dismissible(
-                key: UniqueKey(),
-                onDismissed: (_) {
-                  setState(() {
-                    debugPrint('[info] RecentExpenditure.Dissimissible called'
-                        ' on element $index');
+            return Dismissible(
+              key: UniqueKey(),
+              onDismissed: (_) {
+                setState(() {
+                  debugPrint('[info] ListExpenditure.Dissimissible called'
+                      ' on element $index');
 
-                    Expenditure element = widget.expenditures.elementAt(index);
-                    debugPrint('[info] removing from UI expenditure = $element');
-                    widget.expenditures.removeAt(index);
-
-                    debugPrint('[debug] attempting to remove from database');
-                    DatabaseService.removeExpenditure(
-                      element,
-                    ).catchError((error) {
-                      debugPrint('[error] Unable to delete');
-                      debugPrint('[error] $error');
-                      Scaffold.of(context).showSnackBar(SnackBar(
-                          content: Text(
-                        'Unable to delete expenditure .. Please try again',
-                      )));
-                      widget.expenditures.insert(index, element);
-                    });
-                  });
-                },
-                child: _ListItemExpenditure(
-                  id: index,
-                  expenditure: widget.expenditures[index],
-                  selected: index == widget.selectedIndex,
-                ),
-                background: _buildCardBackground(Alignment.centerLeft),
-                secondaryBackground: _buildCardBackground(Alignment.centerRight),
-              );
-            },
-            physics: BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics(),
-            ),
-          ),
-          onNotification: (notification) {
-            debugPrint('[debug] RecentExpenditure.ListExpenditureState got '
-                'notification selectedIndex = ${notification.selectedIndex}');
-            setState(() {
-              widget.selectedIndex = notification.selectedIndex;
-            });
-            return false; // Send up the tree
+                  _dismissElement(index);
+                });
+              },
+              child: ListItemExpenditure(
+                id: index,
+                expenditure: expenditures[index],
+                selected: expenditures[index].ref == expenditures.selectedExpenditureRef,
+                onTapHandler: _expenditureOnTapHandler,
+              ),
+              background: _buildCardBackground(Alignment.centerLeft),
+              secondaryBackground: _buildCardBackground(Alignment.centerRight),
+            );
           },
+          physics: BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics(),
+          ),
         ),
       ),
+    );
+  }
+
+  void _expenditureOnTapHandler(Expenditure selectedExpenditure) {
+    debugPrint('[debug] $TAG.expenditureOnTapHandler called for expenditure ' + selectedExpenditure.toString());
+    expenditures.select(selectedExpenditure);
+    _scrollController.scrollTo(
+      index: expenditures.indexOf(selectedExpenditure.ref),
+      duration: Duration(milliseconds: 500),
     );
   }
 
@@ -130,117 +119,28 @@ class _ListExpendituresState extends State<_ListExpenditures> {
       child: Icon(Icons.delete, color: Colors.white),
     );
   }
-}
 
-class _ListItemExpenditure extends StatefulWidget {
-  final Expenditure expenditure;
-  final int id;
-  final bool selected;
-  _ListItemExpenditure({
-    @required this.id,
-    @required this.expenditure,
-    @required this.selected,
-  });
+  void _dismissElement(int index) {
+    Expenditure element = expenditures[index];
+    debugPrint('[info] removing from UI expenditure = $element');
 
-  @override
-  _ListItemExpenditureState createState() => _ListItemExpenditureState();
-}
+    print('[info] Item $element will be removed');
+    expenditures.removeAt(index);
 
-class _ListItemExpenditureState extends State<_ListItemExpenditure> {
-  @override
-  Widget build(BuildContext context) {
-    final _cardBorder = RoundedRectangleBorder(
-      borderRadius: BorderRadius.all(Radius.circular(10)),
-    );
+    debugPrint('[debug] attempting to remove from database');
+    DatabaseService.removeExpenditure(
+      element,
+    ).catchError((error) {
+      debugPrint('[error] Unable to delete');
+      debugPrint('[error] $error');
+      Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text(
+        'Unable to delete expenditure .. Please try again',
+      )));
 
-    return AnimatedContainer(
-      duration: Duration(milliseconds: 200),
-      child: Card(
-        shape: _cardBorder,
-        color: (widget.selected == true) ? Colors.indigo : Colors.blue[400],
-        child: InkWell(
-          customBorder: _cardBorder,
-          onTap: () {
-            setState(() {
-              ExpenditureSelectedNotification(
-                selectedIndex: widget.id,
-              ).dispatch(context);
-            });
-            print('[info] ListItemExpenditure tapped');
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Icon(
-                      Icons.shopping_cart,
-                      color: Colors.white,
-                    ),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        widget.expenditure.description,
-                        style: TextStyle(color: Colors.white),
-                        softWrap: true,
-                      ),
-                    ),
-                    SizedBox(width: 20),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(2.0),
-                          // child: ,
-                          child: Text(
-                            "Rs ",
-                            // expenditure.amount.currency.format(expenditure.amount),
-                            // expenditure.currency,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          widget.expenditure.amount.toString(),
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      // TODO:
-                      // These take values that are not in database,
-                      // which is incorrect
-                      // They should be assigned default values by model or database
-                      widget.expenditure.timestampToString(),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontStyle: FontStyle.italic,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+      expenditures.insertAt(index, element);
+      print('[info] Item $element will be inserted');
+    });
   }
 }
 
@@ -254,13 +154,5 @@ class _RecentExpendituresHeader extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
     );
-  }
-}
-
-class ExpenditureSelectedNotification extends Notification {
-  final int selectedIndex;
-
-  ExpenditureSelectedNotification({this.selectedIndex}) {
-    print('[debug] SelectedNotification generated with index = $selectedIndex');
   }
 }

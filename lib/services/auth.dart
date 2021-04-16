@@ -2,6 +2,7 @@ import 'package:expenditure/models/user.dart';
 import 'package:expenditure/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_remote_config/firebase_remote_config.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:flutter_twitter_login/flutter_twitter_login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -9,7 +10,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 class AuthService {
   // TODO
   // Need to handle PlatformExceptions for all Platform Login functions
-  /* 
+
+  /*
    * Handles all the authentication related functions
    * Including sign in and sign up
    * Returns instance of AuthResult
@@ -17,7 +19,7 @@ class AuthService {
 
   final auth.FirebaseAuth _firebaseAuth = auth.FirebaseAuth.instance;
 
-  User userFromFirebaseUser(auth.User firebaseUser) {
+  static User userFromFirebaseUser(auth.User firebaseUser) {
     if (firebaseUser == null) return null;
     // firebaseUser.providerData;
     print("[debug] AuthService firebase user = $firebaseUser");
@@ -128,10 +130,11 @@ class AuthService {
   Future signInWithApple() async {}
 
   signOut() {
+    debugPrint('[info] AuthService.signOut()');
     _firebaseAuth.signOut();
   }
 
-  User currentUser() {
+  User get currentUser {
     if (_firebaseAuth.currentUser != null) {
       return userFromFirebaseUser(_firebaseAuth.currentUser);
     }

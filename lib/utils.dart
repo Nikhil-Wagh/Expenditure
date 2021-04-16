@@ -1,5 +1,6 @@
 // Usefull common functions or classes
 // For eg: PaddedTextView
+// ignore: implementation_imports
 import 'package:cloud_firestore_platform_interface/src/timestamp.dart';
 import 'package:intl/number_symbols_data.dart';
 import 'package:intl/intl.dart';

@@ -6,8 +6,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class LoadingAuth extends StatelessWidget {
   @override
-  Widget build(BuildContext contexts) {
-    return Positioned(
+  Widget build(BuildContext context) {
+    return Center(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
         child: Container(

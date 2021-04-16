@@ -1,10 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expenditure/constants.dart';
-import 'package:expenditure/models/expenditure.dart';
+import 'package:expenditure/models/expenditure_item.dart';
+
 import 'package:expenditure/models/user.dart';
+import 'package:expenditure/models/expenditures.dart';
 import 'package:expenditure/services/auth.dart';
 
 import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 
 class DatabaseService {
   /*
@@ -15,23 +19,30 @@ class DatabaseService {
     - get expenditures details till some point time/index
   */
 
-  final String uid = AuthService().currentUser().uid;
+  final String uid = AuthService().currentUser.uid;
   static FirebaseFirestore _firestoreInstance;
   static DocumentReference _userDoc;
   static CollectionReference _expendituresCollection;
 
-  Stream<List<Expenditure>> expenditures({DateTime startDate, DateTime endDate}) {
+  static Expenditures expenditures({DateTime startDate, DateTime endDate}) {
+    // debugPrint("Started WAITING");
+    // Future.delayed(Duration(seconds: 5));
+    // debugPrint("Done WAITING");
+
     print("[info] DatabaseService.expenditure Creating a stream");
     // 1st January, 1970
-    if (startDate == null) startDate = DateTime.parse(DEFAULT_START_DATE);
+    if (startDate == null) startDate = DateTime.parse(FIRST_DATE);
 
-    // Forever
-    if (endDate == null) endDate = DateTime.parse(DEFAULT_END_DATE);
+    // 31st December, 9999
+    if (endDate == null) endDate = DateTime.parse(LAST_DATE);
 
     if (_expendituresCollection == null) {
       _expendituresCollection = _getExpendituresCollection();
     }
-    return _expendituresCollection
+
+    Expenditures expenditures = Expenditures();
+
+    _expendituresCollection
         .where(
           'timestamp',
           isGreaterThanOrEqualTo: Timestamp.fromDate(startDate),
@@ -42,10 +53,23 @@ class DatabaseService {
         )
         .orderBy('timestamp', descending: true)
         // .limit(limit)
-        // TODO: Decide whether we want limit or not
+        // TODO: Decide whether I want limit or not
         // Probably need to do some load testing
         .snapshots()
-        .map(_expendituresListFromSnapshots);
+        .forEach(
+      (item) {
+        assert(item != null);
+        debugPrint('[debug] DatabaseService length of docs = ${item.docs.length}');
+        item.docs.forEach(
+          (doc) {
+            expenditures.add(_expenditureFromDocument(doc));
+          },
+        );
+      },
+    );
+
+    debugPrint('[info] Expenditures captured from database');
+    return expenditures;
   }
 
   Future updateUserData(User user) async {
@@ -65,23 +89,22 @@ class DatabaseService {
     return expenditure.ref.delete();
   }
 
-  List<Expenditure> _expendituresListFromSnapshots(QuerySnapshot querySnapshot) {
-    // Ideally these values should not be null and should raise error if null
-    if (querySnapshot == null) return [];
-    print('[debug] DatabaseService._expendituresListFromSnapshots.'
-        'querySnapshot.size = ${querySnapshot.size}');
-    return querySnapshot.docs.map((doc) {
-      print('[debug] DatabaseService._expendituresListFromSnapshots.doc = '
-          '${doc.data()}');
-      double amount = double.parse(doc.data()['amount'].toString());
-      return Expenditure(
-        ref: doc.reference,
-        amount: amount ?? 0.0,
-        description: doc.data()['description'] ?? '',
-        mode: doc.data()['mode'] ?? 'CASH', // Default mode will be CASH
-        timestamp: doc.data()['timestamp'] ?? Timestamp.now(),
-      );
-    }).toList();
+  static Future<void> updateExpenditure(Expenditure oldExpenditure, Expenditure newExpenditure) {
+    assert(newExpenditure.ref == null);
+    return oldExpenditure.ref.update(newExpenditure.toMap());
+  }
+
+  static Expenditure _expenditureFromDocument(QueryDocumentSnapshot doc) {
+    print('[debug] DatabaseService._expendituresListFromSnapshots.doc = '
+        '${doc.data()}');
+    double amount = double.parse(doc.data()['amount'].toString());
+    return Expenditure(
+      ref: doc.reference,
+      amount: amount,
+      description: doc.data()['description'],
+      mode: doc.data()['mode'], // Default mode will be CASH
+      timestamp: doc.data()['timestamp'],
+    );
   }
 
   static CollectionReference _getExpendituresCollection() {
@@ -98,7 +121,7 @@ class DatabaseService {
     }
 
     return _firestoreInstance.collection(USERS_COLLECTION).doc(
-          AuthService().currentUser().uid,
+          AuthService().currentUser.uid,
         );
   }
 
