@@ -13,8 +13,10 @@ class MonthlyOverviewHolder extends StatefulWidget {
 }
 
 class _MonthlyOverviewHolderState extends State<MonthlyOverviewHolder> {
+  static const String TAG = 'MonthlyOverviewHolder';
   @override
   Widget build(BuildContext context) {
+    debugPrint('[info] $TAG build called');
     final Expenditures expenditures = Provider.of<Expenditures>(context);
     assert(expenditures != null);
 

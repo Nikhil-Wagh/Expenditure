@@ -2,6 +2,7 @@ import 'package:expenditure/models/expenditure_item.dart';
 import 'package:expenditure/models/expenditures.dart';
 import 'package:expenditure/services/database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -12,6 +13,7 @@ class RecentExpenditures extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('[info] $TAG build called');
     return Container(
       child: Expanded(
         child: Container(
@@ -52,6 +54,7 @@ class _ListExpendituresState extends State<ListExpenditures> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('[info] $TAG build called');
     // Loading expenditures
     expenditures = Provider.of<Expenditures>(context);
     _scrollController = Provider.of<ItemScrollController>(context);
@@ -69,7 +72,9 @@ class _ListExpendituresState extends State<ListExpenditures> {
           itemBuilder: (context, index) {
             print('[info] _ListExpendituresState.ListView'
                 '.builder.itemBuilder called on index = $index');
-
+            // Using custom Dismissible instead of lib Slidable because of
+            // padding issue between the background and slidable object
+            // which for now is not customisable.
             return Dismissible(
               key: UniqueKey(),
               onDismissed: (_) {
@@ -120,6 +125,8 @@ class _ListExpendituresState extends State<ListExpenditures> {
     );
   }
 
+  void _editElement(int index) {}
+
   void _dismissElement(int index) {
     Expenditure element = expenditures[index];
     debugPrint('[info] removing from UI expenditure = $element');
@@ -127,19 +134,27 @@ class _ListExpendituresState extends State<ListExpenditures> {
     print('[info] Item $element will be removed');
     expenditures.removeAt(index);
 
+    // TODO: Move this to Expenditures Class
     debugPrint('[debug] attempting to remove from database');
-    DatabaseService.removeExpenditure(
-      element,
-    ).catchError((error) {
+    expenditures[index].ref.delete().then((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('Deleted Sucessfully'),
+            action: SnackBarAction(
+              label: 'Undo',
+              // On undo insert element again
+              onPressed: () => expenditures.insertAt(index, element),
+            )),
+      );
+    }).catchError((error) {
       debugPrint('[error] Unable to delete');
       debugPrint('[error] $error');
-      Scaffold.of(context).showSnackBar(SnackBar(
-          content: Text(
-        'Unable to delete expenditure .. Please try again',
-      )));
-
-      expenditures.insertAt(index, element);
-      print('[info] Item $element will be inserted');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+          'Unable to delete expenditure',
+        )),
+      );
     });
   }
 }

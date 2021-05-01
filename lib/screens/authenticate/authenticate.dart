@@ -186,11 +186,7 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
             },
           ),
           _loginWithOptionsRow(),
-          RaisedButton(
-            color: Colors.orange,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4.0),
-            ),
+          ElevatedButton(
             child: Text(
               'Sign In',
               style: TextStyle(color: Colors.white),
@@ -237,11 +233,7 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
             },
           ),
           _loginWithOptionsRow(),
-          RaisedButton(
-            color: Colors.orange,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4.0),
-            ),
+          ElevatedButton(
             child: Text(
               'Sign Up',
               style: TextStyle(color: Colors.white),

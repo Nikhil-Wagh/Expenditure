@@ -7,17 +7,9 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'home_screen_app_bar.dart';
 import 'home_screen_body.dart';
 
-class Home extends StatefulWidget {
-  // TODO: user can be removed from all constructors as there is a provider
-  // of User in successors
-  Home();
+class Home extends StatelessWidget {
+  static const String TAG = 'Home';
 
-  @override
-  _HomeState createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  static const String TAG = "Home";
   @override
   Widget build(BuildContext context) {
     debugPrint('[info] $TAG.build called');
@@ -40,15 +32,3 @@ class _HomeState extends State<Home> {
     );
   }
 }
-
-// Use this for gradient if it looks good
-// decoration: BoxDecoration(
-//   gradient: LinearGradient(
-//     begin: Alignment.topLeft,
-//     end: Alignment.bottomRight,
-//     colors: [
-//       primaryAccentColor[100],
-//       primaryColor[100],
-//     ],
-//   ),
-// ),

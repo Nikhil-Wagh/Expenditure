@@ -9,8 +9,9 @@ import 'package:expenditure/services/auth.dart';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
 
-class DatabaseService {
+class DatabaseService extends ChangeNotifierProvider {
   /*
     Functions
     - download list of expenditures between dates
@@ -19,6 +20,7 @@ class DatabaseService {
     - get expenditures details till some point time/index
   */
 
+  static const String TAG = 'DatabaseService';
   final String uid = AuthService().currentUser.uid;
   static FirebaseFirestore _firestoreInstance;
   static DocumentReference _userDoc;
@@ -32,15 +34,20 @@ class DatabaseService {
     print("[info] DatabaseService.expenditure Creating a stream");
     // 1st January, 1970
     if (startDate == null) startDate = DateTime.parse(FIRST_DATE);
+    debugPrint('[debug] $TAG startDate = $startDate');
 
     // 31st December, 9999
     if (endDate == null) endDate = DateTime.parse(LAST_DATE);
+    debugPrint('[debug] $TAG endDate = $endDate');
 
     if (_expendituresCollection == null) {
+      debugPrint('[debug] $TAG expenditure collection null, attempting to get');
       _expendituresCollection = _getExpendituresCollection();
     }
 
-    Expenditures expenditures = Expenditures();
+    final Expenditures expenditures = Expenditures();
+    debugPrint('[info] $TAG new expenditures object created');
+    debugPrint('[debug] $TAG expenditures = ${expenditures.toString()}');
 
     _expendituresCollection
         .where(
@@ -62,7 +69,8 @@ class DatabaseService {
         debugPrint('[debug] DatabaseService length of docs = ${item.docs.length}');
         item.docs.forEach(
           (doc) {
-            expenditures.add(_expenditureFromDocument(doc));
+            debugPrint('[debug] $TAG, inserting doc = $doc');
+            expenditures.insert(_expenditureFromDocument(doc));
           },
         );
       },
@@ -85,9 +93,10 @@ class DatabaseService {
     return _expendituresCollection.add(newExpenditure.toMap());
   }
 
-  static Future<void> removeExpenditure(Expenditure expenditure) {
-    return expenditure.ref.delete();
-  }
+  // static Future<void> removeExpenditure(Expenditure expenditure) {
+  //   debugPrint('deleting ref = ${expenditure.ref} from database');
+  //   return expenditure.ref.delete();
+  // }
 
   static Future<void> updateExpenditure(Expenditure oldExpenditure, Expenditure newExpenditure) {
     assert(newExpenditure.ref == null);

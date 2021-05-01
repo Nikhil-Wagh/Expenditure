@@ -68,16 +68,15 @@ class _ExpenditureFormBodyState extends State<ExpenditureFormBody> {
       child: Form(
         key: _addNewExpenditureFormKey,
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(
-              child: Column(
-                children: [
-                  _buildAmountField(),
-                  _buildDescriptionField(),
-                  _buildTimestampField(),
-                  _buildModeField(),
-                ],
-              ),
+            Column(
+              children: [
+                _buildAmountField(),
+                _buildDescriptionField(),
+                _buildTimestampField(),
+                _buildModeField(),
+              ],
             ),
             _buildSaveButton(),
           ],
@@ -179,13 +178,12 @@ class _ExpenditureFormBodyState extends State<ExpenditureFormBody> {
   }
 
   Widget _buildSaveButton() {
-    return RaisedButton(
+    return ElevatedButton(
       onPressed: _onSavePressed,
       child: Text(
         'Save',
         style: TextStyle(color: Colors.white),
       ),
-      color: Colors.indigo,
     );
   }
 
@@ -227,7 +225,7 @@ class _ExpenditureFormBodyState extends State<ExpenditureFormBody> {
       SnackBar _successSnackBar = SnackBar(
         content: Text('Expenditure saved successfully'),
       );
-      Scaffold.of(context).showSnackBar(_successSnackBar);
+      ScaffoldMessenger.of(context).showSnackBar(_successSnackBar);
       // TODO: Goto Home now
     }).catchError((error) {
       debugPrint('[error] Error occurred while saving new Expenditure');
@@ -235,7 +233,7 @@ class _ExpenditureFormBodyState extends State<ExpenditureFormBody> {
       SnackBar _errorSnackBar = SnackBar(
         content: Text('Unable to save Expenditure, please try again'),
       );
-      Scaffold.of(context).showSnackBar(_errorSnackBar);
+      ScaffoldMessenger.of(context).showSnackBar(_errorSnackBar);
     });
   }
 

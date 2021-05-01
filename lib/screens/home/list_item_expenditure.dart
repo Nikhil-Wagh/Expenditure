@@ -1,9 +1,8 @@
 import 'package:expenditure/models/expenditure_item.dart';
 import 'package:flutter/material.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 // TODO: Make this a stateless widget
-class ListItemExpenditure extends StatefulWidget {
+class ListItemExpenditure extends StatelessWidget {
   final Expenditure expenditure;
   final int id;
   final bool selected;
@@ -15,11 +14,6 @@ class ListItemExpenditure extends StatefulWidget {
     @required this.onTapHandler,
   });
 
-  @override
-  _ListItemExpenditureState createState() => _ListItemExpenditureState();
-}
-
-class _ListItemExpenditureState extends State<ListItemExpenditure> {
   static const _borderRadius = BorderRadius.all(Radius.circular(10));
   static const _cardBorder = RoundedRectangleBorder(
     borderRadius: _borderRadius,
@@ -30,7 +24,7 @@ class _ListItemExpenditureState extends State<ListItemExpenditure> {
   @override
   Widget build(BuildContext context) {
     // debugPrint('[info] $TAG.build called');
-    debugPrint('[debug] $TAG id = ${widget.id}, selected = ${widget.selected}');
+    debugPrint('[debug] $TAG id = $id, selected = $selected');
     return Card(
       margin: EdgeInsets.all(4),
       shape: _cardBorder,
@@ -38,12 +32,12 @@ class _ListItemExpenditureState extends State<ListItemExpenditure> {
         customBorder: _cardBorder,
         onTap: () {
           print('[info] ListItemExpenditure tapped');
-          widget.onTapHandler(widget.expenditure);
+          onTapHandler(expenditure);
         },
         child: Ink(
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
           decoration: BoxDecoration(
-            color: (widget.selected == true) ? Colors.indigo : Colors.blue[400],
+            color: (selected == true) ? Colors.indigo : Colors.blue[400],
             border: Border.all(color: Colors.black, width: 3),
             borderRadius: _borderRadius,
           ),
@@ -59,7 +53,7 @@ class _ListItemExpenditureState extends State<ListItemExpenditure> {
                   SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      widget.expenditure.description,
+                      expenditure.description,
                       style: TextStyle(color: Colors.white),
                       softWrap: true,
                     ),
@@ -83,7 +77,7 @@ class _ListItemExpenditureState extends State<ListItemExpenditure> {
                         ),
                       ),
                       Text(
-                        widget.expenditure.amount.toString(),
+                        expenditure.amount.toString(),
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -103,7 +97,7 @@ class _ListItemExpenditureState extends State<ListItemExpenditure> {
                     // These take values that are not in database,
                     // which is incorrect
                     // They should be assigned default values by model or database
-                    widget.expenditure.timestampToString(),
+                    expenditure.timestampToString(),
                     style: TextStyle(
                       color: Colors.white,
                       fontStyle: FontStyle.italic,

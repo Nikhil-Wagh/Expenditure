@@ -1,6 +1,3 @@
-import 'dart:collection';
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -10,18 +7,14 @@ class Expenditures extends ChangeNotifier {
   static const String TAG = 'ExpendituresModel';
   final List<Expenditure> _items = [];
   DocumentReference _selectedExpenditureRef;
-  UnmodifiableListView<Expenditure> get items => UnmodifiableListView(_items);
+  List<Expenditure> get items => _items.toList();
+  // UnmodifiableListView<Expenditure> get items => UnmodifiableListView(_items);
 
   DocumentReference get selectedExpenditureRef {
     if (_items.isEmpty) {
       return null;
     }
     return _selectedExpenditureRef ?? _items.first.ref;
-  }
-
-  void add(Expenditure item) {
-    _items.add(item);
-    notifyListeners();
   }
 
   void select(Expenditure item) {
@@ -40,24 +33,24 @@ class Expenditures extends ChangeNotifier {
     return _items[index];
   }
 
-  int get count {
-    return _items.length;
-  }
-
   void removeAt(int index) {
     _items.removeAt(index);
+    notifyListeners();
   }
 
   void remove(Expenditure expenditure) {
     _items.remove(expenditure);
+    notifyListeners();
   }
 
   void insertAt(int index, Expenditure element) {
     _items.insert(index, element);
+    notifyListeners();
   }
 
   void insert(Expenditure element) {
-    _items.insert(_items.length - 1, element);
+    _items.add(element);
+    notifyListeners();
   }
 
   int indexOf(DocumentReference ref) {

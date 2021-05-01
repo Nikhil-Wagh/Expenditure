@@ -1,8 +1,6 @@
 import 'package:expenditure/constants.dart';
-import 'package:expenditure/models/expenditures.dart';
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import 'expenditure_form_body.dart';
 
