@@ -1,7 +1,6 @@
 import 'package:expenditure/models/expenditure_item.dart';
 import 'package:flutter/material.dart';
 
-// TODO: Make this a stateless widget
 class ListItemExpenditure extends StatelessWidget {
   final Expenditure expenditure;
   final int id;
@@ -26,7 +25,7 @@ class ListItemExpenditure extends StatelessWidget {
     // debugPrint('[info] $TAG.build called');
     debugPrint('[debug] $TAG id = $id, selected = $selected');
     return Card(
-      margin: EdgeInsets.all(4),
+      margin: EdgeInsets.symmetric(vertical: 4),
       shape: _cardBorder,
       child: InkWell(
         customBorder: _cardBorder,
