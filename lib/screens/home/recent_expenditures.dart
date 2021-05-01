@@ -80,12 +80,14 @@ class _ListExpendituresState extends State<ListExpenditures> {
           // which for now is not customisable.
           return Dismissible(
             key: UniqueKey(),
-            onDismissed: (_) {
+            onDismissed: (DismissDirection direction) {
               setState(() {
                 debugPrint('[info] ListExpenditure.Dissimissible called'
-                    ' on element $index');
-
-                _dismissElement(index);
+                    ' on element $index, direction = $direction');
+                if (direction == DismissDirection.startToEnd)
+                  _editExpenditure(index);
+                else
+                  _deleteExpenditure(index);
               });
             },
             child: ListItemExpenditure(
@@ -94,8 +96,8 @@ class _ListExpendituresState extends State<ListExpenditures> {
               selected: expenditures[index].ref == expenditures.selectedExpenditureRef,
               onTapHandler: _expenditureOnTapHandler,
             ),
-            background: _buildCardBackground(Alignment.centerLeft),
-            secondaryBackground: _buildCardBackground(Alignment.centerRight),
+            background: _buildEditBackground(),
+            secondaryBackground: _buildDeleteBackground(),
           );
         },
         physics: BouncingScrollPhysics(
@@ -114,22 +116,40 @@ class _ListExpendituresState extends State<ListExpenditures> {
     );
   }
 
-  Widget _buildCardBackground(Alignment position) {
+  Widget _buildEditBackground() {
+    return _buildCardBackground(
+      Alignment.centerLeft,
+      Colors.green,
+      Icons.edit,
+    );
+  }
+
+  Widget _buildDeleteBackground() {
+    return _buildCardBackground(
+      Alignment.centerRight,
+      Colors.red,
+      Icons.delete,
+    );
+  }
+
+  Widget _buildCardBackground(Alignment position, Color bgColor, IconData icon) {
     return Container(
-      color: Colors.red,
+      color: bgColor,
       alignment: position,
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       margin: const EdgeInsets.symmetric(
         vertical: 4,
         horizontal: 4,
       ),
-      child: Icon(Icons.delete, color: Colors.white),
+      child: Icon(icon, color: Colors.white),
     );
   }
 
-  void _editElement(int index) {}
+  void _editExpenditure(int index) {
+    // This needs routes navigator to be implemented first
+  }
 
-  void _dismissElement(int index) {
+  void _deleteExpenditure(int index) {
     Expenditure element = expenditures[index];
     debugPrint('[info] removing from UI expenditure = $element');
 
