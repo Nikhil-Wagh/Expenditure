@@ -2,7 +2,6 @@ import 'package:expenditure/models/expenditure_item.dart';
 import 'package:expenditure/models/expenditures.dart';
 import 'package:expenditure/services/database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -59,45 +58,48 @@ class _ListExpendituresState extends State<ListExpenditures> {
     expenditures = Provider.of<Expenditures>(context);
     _scrollController = Provider.of<ItemScrollController>(context);
 
+    if (expenditures.isLoading) {
+      // TODO: Create a loading placeholder
+      return Container(child: Text('Loading ...'));
+    }
+
     print('[debug] $TAG.build'
         '.expenditures.length = ${expenditures.length}');
     print('[debug] $TAG.build'
         '.selectedIndex = ${expenditures.selectedExpenditureRef}');
 
-    return Container(
-      child: Expanded(
-        child: ScrollablePositionedList.builder(
-          itemScrollController: _scrollController,
-          itemCount: expenditures.length,
-          itemBuilder: (context, index) {
-            print('[info] _ListExpendituresState.ListView'
-                '.builder.itemBuilder called on index = $index');
-            // Using custom Dismissible instead of lib Slidable because of
-            // padding issue between the background and slidable object
-            // which for now is not customisable.
-            return Dismissible(
-              key: UniqueKey(),
-              onDismissed: (_) {
-                setState(() {
-                  debugPrint('[info] ListExpenditure.Dissimissible called'
-                      ' on element $index');
+    return Expanded(
+      child: ScrollablePositionedList.builder(
+        itemScrollController: _scrollController,
+        itemCount: expenditures.length,
+        itemBuilder: (context, index) {
+          print('[info] _ListExpendituresState.ListView'
+              '.builder.itemBuilder called on index = $index');
+          // Using custom Dismissible instead of lib Slidable because of
+          // padding issue between the background and slidable object
+          // which for now is not customisable.
+          return Dismissible(
+            key: UniqueKey(),
+            onDismissed: (_) {
+              setState(() {
+                debugPrint('[info] ListExpenditure.Dissimissible called'
+                    ' on element $index');
 
-                  _dismissElement(index);
-                });
-              },
-              child: ListItemExpenditure(
-                id: index,
-                expenditure: expenditures[index],
-                selected: expenditures[index].ref == expenditures.selectedExpenditureRef,
-                onTapHandler: _expenditureOnTapHandler,
-              ),
-              background: _buildCardBackground(Alignment.centerLeft),
-              secondaryBackground: _buildCardBackground(Alignment.centerRight),
-            );
-          },
-          physics: BouncingScrollPhysics(
-            parent: AlwaysScrollableScrollPhysics(),
-          ),
+                _dismissElement(index);
+              });
+            },
+            child: ListItemExpenditure(
+              id: index,
+              expenditure: expenditures[index],
+              selected: expenditures[index].ref == expenditures.selectedExpenditureRef,
+              onTapHandler: _expenditureOnTapHandler,
+            ),
+            background: _buildCardBackground(Alignment.centerLeft),
+            secondaryBackground: _buildCardBackground(Alignment.centerRight),
+          );
+        },
+        physics: BouncingScrollPhysics(
+          parent: AlwaysScrollableScrollPhysics(),
         ),
       ),
     );
@@ -136,14 +138,16 @@ class _ListExpendituresState extends State<ListExpenditures> {
 
     // TODO: Move this to Expenditures Class
     debugPrint('[debug] attempting to remove from database');
-    expenditures[index].ref.delete().then((_) {
+    element.ref.delete().then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text('Deleted Sucessfully'),
             action: SnackBarAction(
               label: 'Undo',
               // On undo insert element again
-              onPressed: () => expenditures.insertAt(index, element),
+              onPressed: () {
+                _undoDelete(index, element);
+              },
             )),
       );
     }).catchError((error) {
@@ -156,6 +160,11 @@ class _ListExpendituresState extends State<ListExpenditures> {
         )),
       );
     });
+  }
+
+  void _undoDelete(index, element) {
+    expenditures.insertAt(index, element);
+    DatabaseService.addNewExpenditure(element);
   }
 }
 

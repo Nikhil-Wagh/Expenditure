@@ -3,7 +3,6 @@ import 'package:expenditure/constants.dart';
 import 'package:expenditure/models/expenditure_item.dart';
 
 import 'package:expenditure/models/user.dart';
-import 'package:expenditure/models/expenditures.dart';
 import 'package:expenditure/services/auth.dart';
 
 import 'dart:io';
@@ -26,7 +25,7 @@ class DatabaseService extends ChangeNotifierProvider {
   static DocumentReference _userDoc;
   static CollectionReference _expendituresCollection;
 
-  static Expenditures expenditures({DateTime startDate, DateTime endDate}) {
+  static Stream<List<Expenditure>> expendituresList({DateTime startDate, DateTime endDate}) {
     // debugPrint("Started WAITING");
     // Future.delayed(Duration(seconds: 5));
     // debugPrint("Done WAITING");
@@ -45,11 +44,11 @@ class DatabaseService extends ChangeNotifierProvider {
       _expendituresCollection = _getExpendituresCollection();
     }
 
-    final Expenditures expenditures = Expenditures();
-    debugPrint('[info] $TAG new expenditures object created');
-    debugPrint('[debug] $TAG expenditures = ${expenditures.toString()}');
+    // final Expenditures expenditures = Expenditures();
+    // debugPrint('[info] $TAG new expenditures object created');
+    // debugPrint('[debug] $TAG expenditures = ${expenditures.toString()}');
 
-    _expendituresCollection
+    return _expendituresCollection
         .where(
           'timestamp',
           isGreaterThanOrEqualTo: Timestamp.fromDate(startDate),
@@ -63,21 +62,14 @@ class DatabaseService extends ChangeNotifierProvider {
         // TODO: Decide whether I want limit or not
         // Probably need to do some load testing
         .snapshots()
-        .forEach(
-      (item) {
-        assert(item != null);
-        debugPrint('[debug] DatabaseService length of docs = ${item.docs.length}');
-        item.docs.forEach(
-          (doc) {
-            debugPrint('[debug] $TAG, inserting doc = $doc');
-            expenditures.insert(_expenditureFromDocument(doc));
-          },
-        );
-      },
-    );
+        .map(_expendituresListFromSnapshots);
+  }
 
-    debugPrint('[info] Expenditures captured from database');
-    return expenditures;
+  static List<Expenditure> _expendituresListFromSnapshots(QuerySnapshot querySnapshot) {
+    // Ideally these values should not be null and should raise error if null
+    if (querySnapshot == null) return [];
+    print('[debug] DatabaseService._expendituresListFromSnapshots.querySnapshot.size = ${querySnapshot.size}');
+    return querySnapshot.docs.map(_expenditureFromDocument).toList();
   }
 
   Future updateUserData(User user) async {
@@ -93,10 +85,12 @@ class DatabaseService extends ChangeNotifierProvider {
     return _expendituresCollection.add(newExpenditure.toMap());
   }
 
-  // static Future<void> removeExpenditure(Expenditure expenditure) {
-  //   debugPrint('deleting ref = ${expenditure.ref} from database');
-  //   return expenditure.ref.delete();
-  // }
+  static Future<void> removeExpenditure(Expenditure expenditure) {
+    assert(expenditure.ref != null);
+    debugPrint('deleting ref = ${expenditure.ref} from database');
+
+    return expenditure.ref.delete();
+  }
 
   static Future<void> updateExpenditure(Expenditure oldExpenditure, Expenditure newExpenditure) {
     assert(newExpenditure.ref == null);
@@ -104,6 +98,9 @@ class DatabaseService extends ChangeNotifierProvider {
   }
 
   static Expenditure _expenditureFromDocument(QueryDocumentSnapshot doc) {
+    assert(doc != null);
+    assert(doc.data().isNotEmpty);
+
     print('[debug] DatabaseService._expendituresListFromSnapshots.doc = '
         '${doc.data()}');
     double amount = double.parse(doc.data()['amount'].toString());
@@ -111,7 +108,7 @@ class DatabaseService extends ChangeNotifierProvider {
       ref: doc.reference,
       amount: amount,
       description: doc.data()['description'],
-      mode: doc.data()['mode'], // Default mode will be CASH
+      mode: doc.data()['mode'],
       timestamp: doc.data()['timestamp'],
     );
   }

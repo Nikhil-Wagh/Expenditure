@@ -7,6 +7,7 @@ import 'package:expenditure/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+// This doesn't have to be a statefulwidget
 class MonthlyOverviewHolder extends StatefulWidget {
   @override
   _MonthlyOverviewHolderState createState() => _MonthlyOverviewHolderState();
@@ -18,10 +19,18 @@ class _MonthlyOverviewHolderState extends State<MonthlyOverviewHolder> {
   Widget build(BuildContext context) {
     debugPrint('[info] $TAG build called');
     final Expenditures expenditures = Provider.of<Expenditures>(context);
-    assert(expenditures != null);
 
+    debugPrint('[info] $TAG expenditures = $expenditures');
+    if (expenditures.isLoading) {
+      // TODO: Create a loading placeholder
+      return Container(
+        child: Text('Loading ...'),
+      );
+    }
+
+    debugPrint('[debug] $TAG calling isEmpty');
     if (expenditures.isEmpty) {
-      // TODO: Return a proper Container
+      // TODO: Return a proper Widget
       return Container(
         child: Text("No Expenditures added yet"),
       );
