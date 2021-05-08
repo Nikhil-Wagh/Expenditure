@@ -41,9 +41,10 @@ class Expenditures extends ChangeNotifier {
   void removeAt(int index) {
     debugPrint('[debug] $TAG Removing element at index = $index');
     if (items[index].ref == _selectedExpenditureRef) {
-      debugPrint('[debug] $TAG attempting to delete selected element');
+      debugPrint('[debug] $TAG attempting to select element next candidate');
       _selectNextCandidate(index);
     }
+
     items.removeAt(index);
     notifyListeners();
   }
@@ -89,6 +90,6 @@ class Expenditures extends ChangeNotifier {
 
   @override
   String toString() {
-    return "{items: ${items.toString()}, selectedExpenditureRef: $_selectedExpenditureRef}";
+    return "{items: ${items.toString()}, selectedExpenditureRef: $selectedExpenditureRef}";
   }
 }
