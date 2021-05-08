@@ -2,12 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:expenditure/constants.dart';
 import 'package:expenditure/models/expenditure_item.dart';
+import 'package:expenditure/models/mode_item.dart';
 import 'package:expenditure/services/database.dart';
 import 'package:expenditure/utils/input_validator.dart';
 import 'package:flutter/foundation.dart';
-import 'mode_item.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 // For DateFormat
@@ -15,8 +16,9 @@ import 'package:intl/intl.dart';
 
 class ExpenditureFormBody extends StatefulWidget {
   final Expenditure expenditure;
+  final void Function() onSaved;
 
-  ExpenditureFormBody({this.expenditure});
+  ExpenditureFormBody({this.expenditure, @required this.onSaved});
 
   @override
   _ExpenditureFormBodyState createState() => _ExpenditureFormBodyState();
@@ -38,9 +40,9 @@ class _ExpenditureFormBodyState extends State<ExpenditureFormBody> {
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
   TextEditingController _dateTimeFieldController = TextEditingController(
-      text: DateFormat.yMMMMd().add_jm().format(
-            DateTime.now(),
-          ));
+      text: DateFormat(timestampFormat).format(
+    DateTime.now(),
+  ));
 
   @override
   void initState() {
@@ -50,6 +52,7 @@ class _ExpenditureFormBodyState extends State<ExpenditureFormBody> {
           '${widget.expenditure.timestamp}');
 
       _dateTimeFieldController.text = widget.expenditure.timestampToString();
+      _timestamp = widget.expenditure.timestamp;
     }
     super.initState();
   }
@@ -86,22 +89,36 @@ class _ExpenditureFormBodyState extends State<ExpenditureFormBody> {
   }
 
   Widget _buildAmountField() {
+    TextEditingController _controller = TextEditingController();
+    _controller.text = widget.expenditure != null ? NumberFormat.decimalPattern(Intl.defaultLocale).format(widget.expenditure.amount.value) : '';
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
+        controller: _controller,
         keyboardType: TextInputType.number,
         decoration: InputDecoration(
           border: OutlineInputBorder(),
           labelText: 'Amount',
           hintText: '0.00',
+          // TODO: this prefixIcon is hardcoded, it should come from locale
           prefixIcon: Icon(MdiIcons.currencyInr),
         ),
         validator: InputValidator.validateAmount,
+        onChanged: (string) {
+          String newString = NumberFormat.decimalPattern(Intl.defaultLocale).format(
+            int.parse(string.replaceAll(',', '')),
+          );
+          debugPrint('NEW STRING = $newString');
+          _controller.value = TextEditingValue(
+            text: newString,
+            selection: TextSelection.collapsed(offset: newString.length),
+          );
+        },
         onSaved: (newValue) {
-          _amount = double.parse(newValue.trim());
+          _amount = double.parse(newValue.replaceAll(',', '').trim());
         },
         autovalidateMode: AutovalidateMode.onUserInteraction,
-        initialValue: widget.expenditure != null ? widget.expenditure.amount.toString() : '',
+        // initialValue: widget.expenditure != null ? widget.expenditure.amount.value.toString() : '',
       ),
     );
   }
@@ -131,6 +148,8 @@ class _ExpenditureFormBodyState extends State<ExpenditureFormBody> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
+        showCursor: false,
+        readOnly: true,
         keyboardType: TextInputType.datetime,
         decoration: InputDecoration(
           border: OutlineInputBorder(),
@@ -188,17 +207,15 @@ class _ExpenditureFormBodyState extends State<ExpenditureFormBody> {
   }
 
   void _onSavePressed() {
-    debugPrint('[info] _onSavePressed()');
+    debugPrint('[info] $TAG._onSavePressed called');
     if (!_addNewExpenditureFormKey.currentState.validate()) {
       return;
     }
 
     _addNewExpenditureFormKey.currentState.save();
 
-    debugPrint('$TAG._onSavePressed called');
-
     Expenditure newExpenditure = Expenditure(
-      amount: _amount,
+      amount: Amount(_amount, Intl.defaultLocale),
       description: _description,
       mode: _mode.name,
       timestamp: _timestamp,
@@ -206,27 +223,29 @@ class _ExpenditureFormBodyState extends State<ExpenditureFormBody> {
     debugPrint('$TAG._onSavePressed.newExpenditure = '
         '${newExpenditure.toString()}');
 
-    Future<DocumentReference> savedDocRef;
+    Future<dynamic> savedDocRef;
 
     if (widget.expenditure != null) {
+      debugPrint('[info] $TAG attempting to update expenditure');
       savedDocRef = DatabaseService.updateExpenditure(
         widget.expenditure,
         newExpenditure,
       );
     } else {
+      debugPrint('[info] $TAG attempting to add new expenditure');
       savedDocRef = DatabaseService.addNewExpenditure(newExpenditure);
     }
 
     savedDocRef.then((_) {
-      debugPrint('[info] AddNewExpenditure._onSavePressed :: '
+      debugPrint('[info] $TAG._onSavePressed :: '
           'Saved new expenditure successfully');
-      debugPrint('[info] AddNewExpenditure._onSavePressed :: Resetting fields');
+      debugPrint('[info] $TAG._onSavePressed :: Resetting fields');
       _addNewExpenditureFormKey.currentState.reset();
       SnackBar _successSnackBar = SnackBar(
         content: Text('Expenditure saved successfully'),
       );
       ScaffoldMessenger.of(context).showSnackBar(_successSnackBar);
-      // TODO: Goto Home now
+      widget.onSaved();
     }).catchError((error) {
       debugPrint('[error] Error occurred while saving new Expenditure');
       debugPrint('[error] Original error = $error');
@@ -244,7 +263,7 @@ class _ExpenditureFormBodyState extends State<ExpenditureFormBody> {
       selectedDate.day,
     );
     final DateTime _lastDate = DateTime(
-      selectedDate.year + 10,
+      selectedDate.year,
       selectedDate.month,
       selectedDate.day,
     );
@@ -295,8 +314,8 @@ class _ExpenditureFormBodyState extends State<ExpenditureFormBody> {
     );
     _timestamp = Timestamp.fromDate(_selectedDateTime);
     debugPrint('[debug] $TAG, setting selected DataTime = $_selectedDateTime');
-    _dateTimeFieldController.text = DateFormat.yMMMMd().add_jm().format(
-          _selectedDateTime,
-        );
+    _dateTimeFieldController.text = DateFormat(timestampFormat).format(
+      _selectedDateTime,
+    );
   }
 }

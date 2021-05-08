@@ -16,7 +16,15 @@ class ExpendituresProvider extends StatelessWidget {
           create: (context) => Expenditures(
             Provider.of<List<Expenditure>>(context, listen: false),
           ),
-          update: (context, List<Expenditure> expendituresList, Expenditures expenditures) => Expenditures(expendituresList, selectedExpenditureRef: expenditures.selectedExpenditureRef),
+          update: (
+            context,
+            List<Expenditure> expendituresList,
+            Expenditures expenditures,
+          ) =>
+              Expenditures(
+            expendituresList,
+            selectedExpenditureRef: expenditures.selectedExpenditureRef,
+          ),
         ),
       ],
       child: AppNavigator(),

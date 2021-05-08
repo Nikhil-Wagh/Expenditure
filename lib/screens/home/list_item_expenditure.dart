@@ -6,11 +6,13 @@ class ListItemExpenditure extends StatelessWidget {
   final int id;
   final bool selected;
   final Function(Expenditure) onTapHandler;
+  final Function(Expenditure) onLongPressHandler;
   ListItemExpenditure({
     @required this.id,
     @required this.expenditure,
     @required this.selected,
     @required this.onTapHandler,
+    this.onLongPressHandler,
   });
 
   static const _borderRadius = BorderRadius.all(Radius.circular(10));
@@ -18,7 +20,7 @@ class ListItemExpenditure extends StatelessWidget {
     borderRadius: _borderRadius,
   );
 
-  static const String TAG = 'ListItemExpenditureState';
+  static const String TAG = 'ListItemExpenditure';
 
   @override
   Widget build(BuildContext context) {
@@ -30,8 +32,12 @@ class ListItemExpenditure extends StatelessWidget {
       child: InkWell(
         customBorder: _cardBorder,
         onTap: () {
-          print('[info] ListItemExpenditure tapped');
+          print('[info] $TAG tapped');
           onTapHandler(expenditure);
+        },
+        onLongPress: () {
+          debugPrint('[info] $TAG long press');
+          onLongPressHandler(expenditure);
         },
         child: Ink(
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
@@ -45,57 +51,36 @@ class ListItemExpenditure extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(
-                    Icons.shopping_cart,
-                    color: Colors.white,
-                  ),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      expenditure.description,
-                      style: TextStyle(color: Colors.white),
-                      softWrap: true,
-                    ),
-                  ),
-                  SizedBox(width: 20),
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.all(2.0),
-                        // child: ,
-                        child: Text(
-                          "Rs ",
-                          // expenditure.amount.currency.format(expenditure.amount),
-                          // expenditure.currency,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 10,
-                          ),
-                        ),
+                      Icon(
+                        Icons.shopping_cart,
+                        color: Colors.white,
                       ),
+                      SizedBox(width: 8),
                       Text(
-                        expenditure.amount.toString(),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        ),
+                        expenditure.description,
+                        style: TextStyle(color: Colors.white),
+                        softWrap: true,
                       ),
                     ],
                   ),
+                  Text(
+                    expenditure.amount.toString(),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
                 ],
               ),
-              SizedBox(height: 8),
+              SizedBox(height: 2),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
-                    // TODO:
-                    // These take values that are not in database,
-                    // which is incorrect
-                    // They should be assigned default values by model or database
                     expenditure.timestampToString(),
                     style: TextStyle(
                       color: Colors.white,

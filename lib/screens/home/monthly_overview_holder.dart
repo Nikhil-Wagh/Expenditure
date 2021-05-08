@@ -8,12 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 // This doesn't have to be a statefulwidget
-class MonthlyOverviewHolder extends StatefulWidget {
-  @override
-  _MonthlyOverviewHolderState createState() => _MonthlyOverviewHolderState();
-}
-
-class _MonthlyOverviewHolderState extends State<MonthlyOverviewHolder> {
+class MonthlyOverviewHolder extends StatelessWidget {
   static const String TAG = 'MonthlyOverviewHolder';
   @override
   Widget build(BuildContext context) {
@@ -21,6 +16,12 @@ class _MonthlyOverviewHolderState extends State<MonthlyOverviewHolder> {
     final Expenditures expenditures = Provider.of<Expenditures>(context);
 
     debugPrint('[info] $TAG expenditures = $expenditures');
+    if (expenditures.length != 0)
+      assert(
+        expenditures.selectedExpenditureRef != null,
+        '$TAG, selectedExpenditureRef cannot be null',
+      );
+
     if (expenditures.isLoading) {
       // TODO: Create a loading placeholder
       return Container(
@@ -87,7 +88,11 @@ class _MonthlyOverviewHolderState extends State<MonthlyOverviewHolder> {
     double expenses = 0;
 
     // index 0 is the latest expenditure
-    expenditures.items.where((expenditure) => (expenditure.timestamp.compareTo(_selectedExpenditure.timestamp) <= 0)).forEach((item) {
+    expenditures.items
+        .where(
+      (expenditure) => (expenditure.timestamp.compareTo(_selectedExpenditure.timestamp) <= 0),
+    )
+        .forEach((item) {
       DateTime currentExpenditureMonthDateTime = Utils.dateFromTimestamp(
         item.timestamp,
       );
@@ -98,7 +103,7 @@ class _MonthlyOverviewHolderState extends State<MonthlyOverviewHolder> {
         return;
       }
 
-      expenses += item.amount;
+      expenses += item.amount.toDouble();
     });
 
     return MonthlyOverview(
