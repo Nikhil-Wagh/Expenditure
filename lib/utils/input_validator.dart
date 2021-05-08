@@ -11,11 +11,10 @@ class InputValidator {
     if (inputAmount.isEmpty) {
       return 'Amount can\'t be empty';
     }
+    inputAmount = inputAmount.replaceAll(',', '');
     double _amount = double.tryParse(inputAmount);
     if (_amount == null) {
       return 'Amount has to be a number';
-    } else if (_amount > 1000000) {
-      return 'Bruh! You don\'t need this app, you have enough';
     }
     return null;
   }

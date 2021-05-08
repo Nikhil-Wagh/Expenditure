@@ -2,44 +2,47 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+const String timestampFormat = 'd MMM, h:mm a';
+
 // TODO: rename to ExpenditureItem
 class Expenditure extends ChangeNotifier {
   DocumentReference ref;
-  Amount _amount;
+  Amount amount;
   String description, mode;
   Timestamp timestamp;
+  String category;
+  static const String TAG = 'ExpenditureItem';
 
-  Expenditure({this.ref, double amount, this.description, this.mode, this.timestamp}) {
-    print('[info] Creating new expenditure');
-    print('[debug] Models.Expenditure.data = $amount, $description, $mode, $timestamp');
-    this._amount = Amount(amount);
+  Expenditure({this.ref, this.amount, this.description, this.mode, this.timestamp, this.category}) {
+    print('[info] $TAG Creating new expenditure');
+    print('[debug] $TAG Models.Expenditure.data = $amount, $description, $mode, $timestamp');
   }
 
   String timestampToString() {
-    return DateFormat.MMMd().addPattern(', ').add_jm().format(timestamp.toDate());
+    return DateFormat(timestampFormat).format(timestamp.toDate());
   }
 
   String toStringDebug() {
     return '[ ref = $ref, amount = $amount, description $description, '
-        'mode = $mode, timestamp = $timestamp ]';
+        'mode = $mode, category = $category, timestamp = $timestamp ]';
   }
 
   String toString() {
-    return '$amount, $description, $mode, ${timestampToString()}';
+    return '${amount.toString()}, $description, $mode, ${timestampToString()}';
   }
 
   Map<String, dynamic> toMap() {
     return {
       'id': ref,
-      'amount': amount,
+      'amount': {
+        'value': amount.value,
+        'locale': amount.locale
+      },
       'description': description,
       'mode': mode,
-      'timestamp': timestamp
+      'category': category,
+      'timestamp': timestamp,
     };
-  }
-
-  double get amount {
-    return _amount.toDouble();
   }
 
   contains(String query) {
@@ -52,21 +55,21 @@ class Expenditure extends ChangeNotifier {
 }
 
 class Amount {
-  double _amount;
-  var currency;
-  Amount(var amount, {this.currency}) {
-    this._amount = double.parse(amount.toString());
-    if (currency == null) {
-      // currency = Util.getCurrency();
-    }
-  }
+  double value;
+  String locale;
+  Amount(this.value, this.locale);
+
+  String get currency => NumberFormat.simpleCurrency(locale: locale).currencySymbol;
 
   double toDouble() {
-    return _amount;
+    return value;
   }
 
   @override
   String toString() {
-    return _amount.toStringAsFixed(2);
+    return NumberFormat.simpleCurrency(
+      locale: locale,
+      decimalDigits: 2,
+    ).format(value);
   }
 }

@@ -7,19 +7,31 @@ import 'package:expenditure/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class MonthlyOverviewHolder extends StatefulWidget {
-  @override
-  _MonthlyOverviewHolderState createState() => _MonthlyOverviewHolderState();
-}
-
-class _MonthlyOverviewHolderState extends State<MonthlyOverviewHolder> {
+// This doesn't have to be a statefulwidget
+class MonthlyOverviewHolder extends StatelessWidget {
+  static const String TAG = 'MonthlyOverviewHolder';
   @override
   Widget build(BuildContext context) {
+    debugPrint('[info] $TAG build called');
     final Expenditures expenditures = Provider.of<Expenditures>(context);
-    assert(expenditures != null);
 
+    debugPrint('[info] $TAG expenditures = $expenditures');
+    if (expenditures.length != 0)
+      assert(
+        expenditures.selectedExpenditureRef != null,
+        '$TAG, selectedExpenditureRef cannot be null',
+      );
+
+    if (expenditures.isLoading) {
+      // TODO: Create a loading placeholder
+      return Container(
+        child: Text('Loading ...'),
+      );
+    }
+
+    debugPrint('[debug] $TAG calling isEmpty');
     if (expenditures.isEmpty) {
-      // TODO: Return a proper Container
+      // TODO: Return a proper Widget
       return Container(
         child: Text("No Expenditures added yet"),
       );
@@ -76,7 +88,11 @@ class _MonthlyOverviewHolderState extends State<MonthlyOverviewHolder> {
     double expenses = 0;
 
     // index 0 is the latest expenditure
-    expenditures.items.where((expenditure) => (expenditure.timestamp.compareTo(_selectedExpenditure.timestamp) <= 0)).forEach((item) {
+    expenditures.items
+        .where(
+      (expenditure) => (expenditure.timestamp.compareTo(_selectedExpenditure.timestamp) <= 0),
+    )
+        .forEach((item) {
       DateTime currentExpenditureMonthDateTime = Utils.dateFromTimestamp(
         item.timestamp,
       );
@@ -87,7 +103,7 @@ class _MonthlyOverviewHolderState extends State<MonthlyOverviewHolder> {
         return;
       }
 
-      expenses += item.amount;
+      expenses += item.amount.toDouble();
     });
 
     return MonthlyOverview(

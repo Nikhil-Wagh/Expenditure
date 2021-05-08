@@ -1,16 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:expenditure/constants.dart';
 import 'package:expenditure/models/expenditure_item.dart';
-
 import 'package:expenditure/models/user.dart';
-import 'package:expenditure/models/expenditures.dart';
 import 'package:expenditure/services/auth.dart';
 
-import 'dart:io';
+import 'package:provider/provider.dart';
 
 import 'package:flutter/foundation.dart';
 
-class DatabaseService {
+import 'dart:io';
+
+class DatabaseService extends ChangeNotifierProvider {
   /*
     Functions
     - download list of expenditures between dates
@@ -19,12 +20,13 @@ class DatabaseService {
     - get expenditures details till some point time/index
   */
 
+  static const String TAG = 'DatabaseService';
   final String uid = AuthService().currentUser.uid;
   static FirebaseFirestore _firestoreInstance;
   static DocumentReference _userDoc;
   static CollectionReference _expendituresCollection;
 
-  static Expenditures expenditures({DateTime startDate, DateTime endDate}) {
+  static Stream<List<Expenditure>> expendituresList({DateTime startDate, DateTime endDate}) {
     // debugPrint("Started WAITING");
     // Future.delayed(Duration(seconds: 5));
     // debugPrint("Done WAITING");
@@ -32,17 +34,22 @@ class DatabaseService {
     print("[info] DatabaseService.expenditure Creating a stream");
     // 1st January, 1970
     if (startDate == null) startDate = DateTime.parse(FIRST_DATE);
+    debugPrint('[debug] $TAG startDate = $startDate');
 
     // 31st December, 9999
     if (endDate == null) endDate = DateTime.parse(LAST_DATE);
+    debugPrint('[debug] $TAG endDate = $endDate');
 
     if (_expendituresCollection == null) {
+      debugPrint('[debug] $TAG expenditure collection null, attempting to get');
       _expendituresCollection = _getExpendituresCollection();
     }
 
-    Expenditures expenditures = Expenditures();
+    // final Expenditures expenditures = Expenditures();
+    // debugPrint('[info] $TAG new expenditures object created');
+    // debugPrint('[debug] $TAG expenditures = ${expenditures.toString()}');
 
-    _expendituresCollection
+    return _expendituresCollection
         .where(
           'timestamp',
           isGreaterThanOrEqualTo: Timestamp.fromDate(startDate),
@@ -56,20 +63,14 @@ class DatabaseService {
         // TODO: Decide whether I want limit or not
         // Probably need to do some load testing
         .snapshots()
-        .forEach(
-      (item) {
-        assert(item != null);
-        debugPrint('[debug] DatabaseService length of docs = ${item.docs.length}');
-        item.docs.forEach(
-          (doc) {
-            expenditures.add(_expenditureFromDocument(doc));
-          },
-        );
-      },
-    );
+        .map(_expendituresListFromSnapshots);
+  }
 
-    debugPrint('[info] Expenditures captured from database');
-    return expenditures;
+  static List<Expenditure> _expendituresListFromSnapshots(QuerySnapshot querySnapshot) {
+    // Ideally these values should not be null and should raise error if null
+    if (querySnapshot == null) return [];
+    print('[debug] $TAG._expendituresListFromSnapshots.querySnapshot.size = ${querySnapshot.size}');
+    return querySnapshot.docs.map(_expenditureFromDocument).toList();
   }
 
   Future updateUserData(User user) async {
@@ -86,6 +87,9 @@ class DatabaseService {
   }
 
   static Future<void> removeExpenditure(Expenditure expenditure) {
+    assert(expenditure.ref != null);
+    debugPrint('$TAG deleting ref = ${expenditure.ref} from database');
+
     return expenditure.ref.delete();
   }
 
@@ -95,14 +99,21 @@ class DatabaseService {
   }
 
   static Expenditure _expenditureFromDocument(QueryDocumentSnapshot doc) {
-    print('[debug] DatabaseService._expendituresListFromSnapshots.doc = '
+    assert(doc != null);
+    assert(doc.data().isNotEmpty);
+
+    print('[debug] $TAG._expenditureFromDocument.doc = '
         '${doc.data()}');
-    double amount = double.parse(doc.data()['amount'].toString());
+    double amountValue = doc.data()['amount']['value'];
+    String locale = doc.data()['amount']['locale'];
     return Expenditure(
       ref: doc.reference,
-      amount: amount,
+      amount: Amount(
+        amountValue,
+        locale,
+      ),
       description: doc.data()['description'],
-      mode: doc.data()['mode'], // Default mode will be CASH
+      mode: doc.data()['mode'],
       timestamp: doc.data()['timestamp'],
     );
   }
@@ -127,8 +138,8 @@ class DatabaseService {
 
   static _getFirebaseInstance() {
     if (!Platform.isAndroid || !Platform.isIOS) {
-      String host = "10.0.2.2:8080";
-      print("Connecting to $host");
+      String host = '10.0.2.2:8080';
+      debugPrint('$TAG Connecting to $host');
       FirebaseFirestore.instance.settings = Settings(
         host: host,
         sslEnabled: false,

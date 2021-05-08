@@ -1,27 +1,25 @@
-import 'dart:collection';
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'expenditure_item.dart';
 
 class Expenditures extends ChangeNotifier {
-  static const String TAG = 'ExpendituresModel';
-  final List<Expenditure> _items = [];
-  DocumentReference _selectedExpenditureRef;
-  UnmodifiableListView<Expenditure> get items => UnmodifiableListView(_items);
-
-  DocumentReference get selectedExpenditureRef {
-    if (_items.isEmpty) {
-      return null;
-    }
-    return _selectedExpenditureRef ?? _items.first.ref;
+  Expenditures(this.items, {selectedExpenditureRef}) {
+    this._selectedExpenditureRef = selectedExpenditureRef;
   }
 
-  void add(Expenditure item) {
-    _items.add(item);
-    notifyListeners();
+  static const String TAG = 'ExpendituresModel';
+  final List<Expenditure> items;
+  DocumentReference _selectedExpenditureRef;
+  // UnmodifiableListView<Expenditure> get items => UnmodifiableListView(_items);
+
+  bool get isLoading => items == null;
+
+  DocumentReference get selectedExpenditureRef {
+    if (isEmpty) {
+      return null;
+    }
+    return _selectedExpenditureRef ?? items.first.ref;
   }
 
   void select(Expenditure item) {
@@ -31,38 +29,60 @@ class Expenditures extends ChangeNotifier {
   }
 
   int get length {
-    return _items.length;
+    return items != null ? items.length : 0;
   }
 
-  bool get isEmpty => _items.isEmpty;
+  bool get isEmpty => items != null ? items.isEmpty : true;
 
   Expenditure operator [](int index) {
-    return _items[index];
-  }
-
-  int get count {
-    return _items.length;
+    return items[index];
   }
 
   void removeAt(int index) {
-    _items.removeAt(index);
+    debugPrint('[debug] $TAG Removing element at index = $index');
+    if (items[index].ref == _selectedExpenditureRef) {
+      debugPrint('[debug] $TAG attempting to select element next candidate');
+      _selectNextCandidate(index);
+    }
+
+    items.removeAt(index);
+    notifyListeners();
   }
 
-  void remove(Expenditure expenditure) {
-    _items.remove(expenditure);
+  // Select next candidate when the selectedExpenditure is deleted
+  // Select next element in the list, if it was the last element then
+  // select the previous element
+  void _selectNextCandidate(int index) {
+    debugPrint('[debug] $TAG selecting next candidate');
+    // if last element
+    if (index >= items.length - 1) {
+      debugPrint('[debug] $TAG last element');
+      // if only 1 element, and it will also be deleted
+      if (index == 0) {
+        debugPrint('[debug] $TAG first element');
+        _selectedExpenditureRef = null;
+      } else {
+        debugPrint('[debug] $TAG previous element = ${items[index - 1]}');
+        _selectedExpenditureRef = items[index - 1].ref;
+      }
+    } else
+      _selectedExpenditureRef = items[index + 1].ref;
+    debugPrint('[debug] $TAG selectedRef = $_selectedExpenditureRef');
   }
 
   void insertAt(int index, Expenditure element) {
-    _items.insert(index, element);
+    items.insert(index, element);
+    notifyListeners();
   }
 
   void insert(Expenditure element) {
-    _items.insert(_items.length - 1, element);
+    items.add(element);
+    notifyListeners();
   }
 
   int indexOf(DocumentReference ref) {
-    for (int i = 0; i < _items.length; i++) {
-      if (ref == _items[i].ref) return i;
+    for (int i = 0; i < items.length; i++) {
+      if (ref == items[i].ref) return i;
     }
     // FIXME: Throw an error here
     return -1;
@@ -70,6 +90,6 @@ class Expenditures extends ChangeNotifier {
 
   @override
   String toString() {
-    return "{items: ${_items.toString()}, selectedExpenditureRef: $_selectedExpenditureRef}";
+    return "{items: ${items.toString()}, selectedExpenditureRef: $selectedExpenditureRef}";
   }
 }

@@ -1,5 +1,6 @@
 import 'package:expenditure/models/expenditure_item.dart';
 import 'package:expenditure/models/expenditures.dart';
+import 'package:expenditure/screens/crud_expenditure/edit_expenditure.dart';
 import 'package:expenditure/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +13,7 @@ class RecentExpenditures extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('[info] $TAG build called');
     return Container(
       child: Expanded(
         child: Container(
@@ -52,50 +54,52 @@ class _ListExpendituresState extends State<ListExpenditures> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('[info] $TAG build called');
     // Loading expenditures
     expenditures = Provider.of<Expenditures>(context);
     _scrollController = Provider.of<ItemScrollController>(context);
+
+    if (expenditures.isLoading) {
+      // TODO: Create a loading placeholder
+      return Container(child: Text('Loading ...'));
+    }
 
     print('[debug] $TAG.build'
         '.expenditures.length = ${expenditures.length}');
     print('[debug] $TAG.build'
         '.selectedIndex = ${expenditures.selectedExpenditureRef}');
 
-    return Container(
-      child: Expanded(
-        child: ScrollablePositionedList.builder(
-          itemScrollController: _scrollController,
-          itemCount: expenditures.length,
-          itemBuilder: (context, index) {
-            print('[info] _ListExpendituresState.ListView'
-                '.builder.itemBuilder called on index = $index');
-
-            return Dismissible(
-              key: UniqueKey(),
-              onDismissed: (_) {
-                setState(() {
-                  debugPrint('[info] ListExpenditure.Dissimissible called'
-                      ' on element $index');
-
-                  _dismissElement(index);
-                });
-              },
-              child: ListItemExpenditure(
-                id: index,
-                expenditure: expenditures[index],
-                selected: expenditures[index].ref == expenditures.selectedExpenditureRef,
-                onTapHandler: _expenditureOnTapHandler,
-              ),
-              background: _buildCardBackground(Alignment.centerLeft),
-              secondaryBackground: _buildCardBackground(Alignment.centerRight),
-            );
-          },
-          physics: BouncingScrollPhysics(
-            parent: AlwaysScrollableScrollPhysics(),
-          ),
+    return Expanded(
+      child: ScrollablePositionedList.builder(
+        itemScrollController: _scrollController,
+        itemCount: expenditures.length,
+        physics: BouncingScrollPhysics(
+          parent: AlwaysScrollableScrollPhysics(),
         ),
+        itemBuilder: (context, index) {
+          print('[info] _ListExpendituresState.ListView'
+              '.builder.itemBuilder called on index = $index');
+          // Using custom Dismissible instead of lib Slidable because of
+          // padding issue between the background and slidable object
+          // which for now is not customisable.
+          return ListItemExpenditure(
+            id: index,
+            expenditure: expenditures[index],
+            selected: expenditures[index].ref == expenditures.selectedExpenditureRef,
+            onTapHandler: _expenditureOnTapHandler,
+            onLongPressHandler: _expenditureOnLongPressHandler,
+          );
+        },
       ),
     );
+  }
+
+  void _editExpenditure(Expenditure oldExpenditure) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EditExpenditure(oldExpenditure),
+        ));
   }
 
   void _expenditureOnTapHandler(Expenditure selectedExpenditure) {
@@ -107,40 +111,10 @@ class _ListExpendituresState extends State<ListExpenditures> {
     );
   }
 
-  Widget _buildCardBackground(Alignment position) {
-    return Container(
-      color: Colors.red,
-      alignment: position,
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      margin: const EdgeInsets.symmetric(
-        vertical: 4,
-        horizontal: 4,
-      ),
-      child: Icon(Icons.delete, color: Colors.white),
-    );
-  }
-
-  void _dismissElement(int index) {
-    Expenditure element = expenditures[index];
-    debugPrint('[info] removing from UI expenditure = $element');
-
-    print('[info] Item $element will be removed');
-    expenditures.removeAt(index);
-
-    debugPrint('[debug] attempting to remove from database');
-    DatabaseService.removeExpenditure(
-      element,
-    ).catchError((error) {
-      debugPrint('[error] Unable to delete');
-      debugPrint('[error] $error');
-      Scaffold.of(context).showSnackBar(SnackBar(
-          content: Text(
-        'Unable to delete expenditure .. Please try again',
-      )));
-
-      expenditures.insertAt(index, element);
-      print('[info] Item $element will be inserted');
-    });
+  void _expenditureOnLongPressHandler(Expenditure element) {
+    debugPrint('[debug] $TAG.expenditureOnLongPressHandler called for expenditure ' + element.toString());
+    expenditures.select(element);
+    _editExpenditure(element);
   }
 }
 

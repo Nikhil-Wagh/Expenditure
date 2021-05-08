@@ -1,3 +1,4 @@
+import 'package:expenditure/models/expenditure_item.dart';
 import 'package:expenditure/models/expenditures.dart';
 import 'package:expenditure/services/database.dart';
 import 'package:expenditure/utils/app_navigator.dart';
@@ -10,8 +11,20 @@ class ExpendituresProvider extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<Expenditures>(
-          create: (context) => DatabaseService.expenditures(),
+        StreamProvider(create: (_) => DatabaseService.expendituresList()),
+        ChangeNotifierProxyProvider<List<Expenditure>, Expenditures>(
+          create: (context) => Expenditures(
+            Provider.of<List<Expenditure>>(context, listen: false),
+          ),
+          update: (
+            context,
+            List<Expenditure> expendituresList,
+            Expenditures expenditures,
+          ) =>
+              Expenditures(
+            expendituresList,
+            selectedExpenditureRef: expenditures.selectedExpenditureRef,
+          ),
         ),
       ],
       child: AppNavigator(),
