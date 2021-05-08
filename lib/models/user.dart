@@ -2,6 +2,7 @@ class User {
   String uid, email, displayName, phoneNumber;
   String photoURL;
   bool isLoggedIn;
+  String locale;
 
   User({
     this.uid,
@@ -10,6 +11,7 @@ class User {
     this.phoneNumber,
     this.photoURL,
     this.isLoggedIn = false,
+    this.locale,
   });
 
   Map<String, dynamic> toMap() {
@@ -19,7 +21,8 @@ class User {
       'displayName': this.displayName,
       'phoneNumber': this.phoneNumber,
       'photoURL': this.photoURL,
-      'isLoggedIn': this.isLoggedIn
+      'isLoggedIn': this.isLoggedIn,
+      'locale': this.locale,
     };
   }
 }

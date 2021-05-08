@@ -1,14 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:expenditure/constants.dart';
 import 'package:expenditure/models/expenditure_item.dart';
-
 import 'package:expenditure/models/user.dart';
 import 'package:expenditure/services/auth.dart';
 
-import 'dart:io';
+import 'package:provider/provider.dart';
 
 import 'package:flutter/foundation.dart';
-import 'package:provider/provider.dart';
+
+import 'dart:io';
 
 class DatabaseService extends ChangeNotifierProvider {
   /*
@@ -68,7 +69,7 @@ class DatabaseService extends ChangeNotifierProvider {
   static List<Expenditure> _expendituresListFromSnapshots(QuerySnapshot querySnapshot) {
     // Ideally these values should not be null and should raise error if null
     if (querySnapshot == null) return [];
-    print('[debug] DatabaseService._expendituresListFromSnapshots.querySnapshot.size = ${querySnapshot.size}');
+    print('[debug] $TAG._expendituresListFromSnapshots.querySnapshot.size = ${querySnapshot.size}');
     return querySnapshot.docs.map(_expenditureFromDocument).toList();
   }
 
@@ -87,7 +88,7 @@ class DatabaseService extends ChangeNotifierProvider {
 
   static Future<void> removeExpenditure(Expenditure expenditure) {
     assert(expenditure.ref != null);
-    debugPrint('deleting ref = ${expenditure.ref} from database');
+    debugPrint('$TAG deleting ref = ${expenditure.ref} from database');
 
     return expenditure.ref.delete();
   }
@@ -101,12 +102,16 @@ class DatabaseService extends ChangeNotifierProvider {
     assert(doc != null);
     assert(doc.data().isNotEmpty);
 
-    print('[debug] DatabaseService._expendituresListFromSnapshots.doc = '
+    print('[debug] $TAG._expenditureFromDocument.doc = '
         '${doc.data()}');
-    double amount = double.parse(doc.data()['amount'].toString());
+    double amountValue = doc.data()['amount']['value'];
+    String locale = doc.data()['amount']['locale'];
     return Expenditure(
       ref: doc.reference,
-      amount: amount,
+      amount: Amount(
+        amountValue,
+        locale,
+      ),
       description: doc.data()['description'],
       mode: doc.data()['mode'],
       timestamp: doc.data()['timestamp'],
@@ -133,8 +138,8 @@ class DatabaseService extends ChangeNotifierProvider {
 
   static _getFirebaseInstance() {
     if (!Platform.isAndroid || !Platform.isIOS) {
-      String host = "10.0.2.2:8080";
-      print("Connecting to $host");
+      String host = '10.0.2.2:8080';
+      debugPrint('$TAG Connecting to $host');
       FirebaseFirestore.instance.settings = Settings(
         host: host,
         sslEnabled: false,
