@@ -7,6 +7,9 @@ import 'package:firebase_auth/firebase_auth.dart' as f_auth;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
+
 class LoadApp extends StatelessWidget {
   // 1. Show a splash screen when the app is launched
   // 2. Create firebase instance and wait for it to load
@@ -16,6 +19,8 @@ class LoadApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     debugPrint('[info] LoadApp.build called');
+    initializeDateFormatting();
+    Intl.defaultLocale = 'en_IN';
 
     return Scaffold(
       body: StreamBuilder<f_auth.User>(
