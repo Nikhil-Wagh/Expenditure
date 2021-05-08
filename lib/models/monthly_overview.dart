@@ -1,8 +1,8 @@
 import 'package:expenditure/utils.dart';
 
 class MonthlyOverview {
-  var year, month;
-  var income, expenses;
+  int year, month;
+  double income, expenses;
 
   MonthlyOverview({this.year, this.month, this.income, this.expenses}) {
     if (expenses == null) this.expenses = 0;
