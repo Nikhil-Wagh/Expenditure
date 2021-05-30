@@ -76,7 +76,7 @@ class MonthlyOverviewHolder extends StatelessWidget {
 
     DateTime selectedExpenditureMonthDateTime;
 
-    selectedExpenditureMonthDateTime = Utils.dateFromTimestamp(
+    selectedExpenditureMonthDateTime = Utils.monthYearFromTimestamp(
       _selectedExpenditure.timestamp,
     );
 
@@ -93,7 +93,7 @@ class MonthlyOverviewHolder extends StatelessWidget {
       (expenditure) => (expenditure.timestamp.compareTo(_selectedExpenditure.timestamp) <= 0),
     )
         .forEach((item) {
-      DateTime currentExpenditureMonthDateTime = Utils.dateFromTimestamp(
+      DateTime currentExpenditureMonthDateTime = Utils.monthYearFromTimestamp(
         item.timestamp,
       );
       int currentMonth = currentExpenditureMonthDateTime.month;

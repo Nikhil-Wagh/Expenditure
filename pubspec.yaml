@@ -55,6 +55,20 @@ dependencies:
 
   flutter_slidable: ^0.6.0
 
+  # Google Graphs
+  charts_flutter: ^0.10.0
+
+  # fl chart
+  fl_chart: ^0.36.1
+
+  # month picker for analytics page
+  month_picker_dialog: ^0.4.0
+
+  # Animations
+  # Rotation among texts
+  animated_text_kit: ^4.2.1
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
