@@ -31,18 +31,22 @@ const List<Map<String, dynamic>> PAYMENT_MODES = [
   {
     'name': 'CASH',
     'icon': MdiIcons.cash,
+    'color': Color(0xFF33691E),
   },
   {
     'name': 'UPI',
     'icon': Icons.mobile_friendly_outlined,
+    'color': Color(0xFF0277BD),
   },
   {
     'name': 'CARD',
     'icon': MdiIcons.creditCard,
+    'color': Color(0xFFD32F2F),
   },
   {
     'name': 'NET BANKING',
     'icon': MdiIcons.bank,
+    'color': Color(0xFF6A1B9A),
   },
 ];
 
