@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 import 'expenditure_item.dart';
 
@@ -11,7 +12,6 @@ class Expenditures extends ChangeNotifier {
   static const String TAG = 'ExpendituresModel';
   final List<Expenditure> items;
   DocumentReference _selectedExpenditureRef;
-  // UnmodifiableListView<Expenditure> get items => UnmodifiableListView(_items);
 
   bool get isLoading => items == null;
 
@@ -49,27 +49,6 @@ class Expenditures extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Select next candidate when the selectedExpenditure is deleted
-  // Select next element in the list, if it was the last element then
-  // select the previous element
-  void _selectNextCandidate(int index) {
-    debugPrint('[debug] $TAG selecting next candidate');
-    // if last element
-    if (index >= items.length - 1) {
-      debugPrint('[debug] $TAG last element');
-      // if only 1 element, and it will also be deleted
-      if (index == 0) {
-        debugPrint('[debug] $TAG first element');
-        _selectedExpenditureRef = null;
-      } else {
-        debugPrint('[debug] $TAG previous element = ${items[index - 1]}');
-        _selectedExpenditureRef = items[index - 1].ref;
-      }
-    } else
-      _selectedExpenditureRef = items[index + 1].ref;
-    debugPrint('[debug] $TAG selectedRef = $_selectedExpenditureRef');
-  }
-
   void insertAt(int index, Expenditure element) {
     items.insert(index, element);
     notifyListeners();
@@ -91,5 +70,46 @@ class Expenditures extends ChangeNotifier {
   @override
   String toString() {
     return "{items: ${items.toString()}, selectedExpenditureRef: $selectedExpenditureRef}";
+  }
+
+  get maxAmount {
+    double _maxAmount = double.negativeInfinity;
+    for (Expenditure e in items) {
+      _maxAmount = max(_maxAmount, e.amount.value);
+    }
+    return _maxAmount;
+  }
+
+  get minAmount {
+    double _minAmount = double.infinity;
+    for (Expenditure e in items) {
+      _minAmount = min(_minAmount, e.amount.value);
+    }
+    return _minAmount;
+  }
+
+  Expenditures where(bool Function(Expenditure) test) {
+    return Expenditures(items.where(test).toList());
+  }
+
+  // Select next candidate when the selectedExpenditure is deleted
+  // Select next element in the list, if it was the last element then
+  // select the previous element
+  void _selectNextCandidate(int index) {
+    debugPrint('[debug] $TAG selecting next candidate');
+    // if last element
+    if (index >= items.length - 1) {
+      debugPrint('[debug] $TAG last element');
+      // if only 1 element, and it will also be deleted
+      if (index == 0) {
+        debugPrint('[debug] $TAG first element');
+        _selectedExpenditureRef = null;
+      } else {
+        debugPrint('[debug] $TAG previous element = ${items[index - 1]}');
+        _selectedExpenditureRef = items[index - 1].ref;
+      }
+    } else
+      _selectedExpenditureRef = items[index + 1].ref;
+    debugPrint('[debug] $TAG selectedRef = $_selectedExpenditureRef');
   }
 }

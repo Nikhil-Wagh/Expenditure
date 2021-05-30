@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expenditure/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-const String timestampFormat = 'd MMM, h:mm a';
 
 // TODO: rename to ExpenditureItem
 class Expenditure extends ChangeNotifier {
@@ -18,8 +17,12 @@ class Expenditure extends ChangeNotifier {
     print('[debug] $TAG Models.Expenditure.data = $amount, $description, $mode, $timestamp');
   }
 
+  get month => timestamp.toDate().month;
+
+  get year => timestamp.toDate().year;
+
   String timestampToString() {
-    return DateFormat(timestampFormat).format(timestamp.toDate());
+    return Utils.formatTimestamp(timestamp);
   }
 
   String toStringDebug() {
@@ -33,7 +36,7 @@ class Expenditure extends ChangeNotifier {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': ref,
+      'ref': ref,
       'amount': {
         'value': amount.value,
         'locale': amount.locale
@@ -65,11 +68,7 @@ class Amount {
     return value;
   }
 
-  @override
   String toString() {
-    return NumberFormat.simpleCurrency(
-      locale: locale,
-      decimalDigits: 2,
-    ).format(value);
+    return Utils.formatCurrency(value, locale);
   }
 }
