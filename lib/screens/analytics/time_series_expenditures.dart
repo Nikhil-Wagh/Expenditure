@@ -8,6 +8,8 @@ import 'package:intl/intl.dart';
 
 import 'package:fl_chart/fl_chart.dart';
 
+const String header = 'Time Series of Expenditures';
+
 class TimeSeriesExpenditures extends StatelessWidget {
   TimeSeriesExpenditures(
     this.graphHeight, {
@@ -21,20 +23,33 @@ class TimeSeriesExpenditures extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      elevation: 4,
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        padding: EdgeInsets.all(20),
-        decoration: BoxDecoration(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(2.0),
+          child: Text(
+            header,
+            style: TextStyle(fontSize: 20),
+          ),
+        ),
+        SizedBox(height: 8),
+        Material(
+          elevation: 4,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(width: 3),
+          child: Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(width: 3),
+            ),
+            child: AspectRatio(
+              aspectRatio: 2,
+              child: FlChartLineChart(expenditures, currentMonth),
+            ),
+          ),
         ),
-        child: ConstrainedBox(
-          child: FlChartLineChart(expenditures, currentMonth),
-          constraints: BoxConstraints(maxHeight: graphHeight),
-        ),
-      ),
+      ],
     );
   }
 }
@@ -69,7 +84,7 @@ class FlChartLineChart extends StatelessWidget {
               showTitles: true,
               interval: 7,
               getTitles: (value) => Utils.dayMonthFromDateTime(
-                currentMonth,
+                DateTime(currentMonth.year, currentMonth.month, value.toInt()),
               ),
               margin: 10,
             ),
@@ -98,6 +113,7 @@ class FlChartLineChart extends StatelessWidget {
   }
 
   List<FlSpot> _spots(Expenditures expenditures) {
+    // TODO: group by date
     List<FlSpot> spots = [];
     for (Expenditure e in expenditures.items) {
       FlSpot spot = FlSpot(
