@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:provider/provider.dart';
 
+import 'pie_chart_mode_distribution.dart';
 import 'time_series_expenditures.dart';
 
 class AnalyticsPage extends StatefulWidget {
@@ -143,7 +144,14 @@ class _MonthControllerState extends State<MonthController> with SingleTickerProv
     return Container(
       child: SlideTransition(
         position: _offsetAnimation,
-        child: Text(Utils.monthYearFromDateTime(widget.currentMonth)),
+        child: Text(
+          Utils.monthYearFromDateTime(widget.currentMonth),
+          style: TextStyle(
+            fontSize: 24,
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
     );
   }
@@ -173,22 +181,28 @@ class _GraphsListState extends State<GraphsList> {
     );
     double graphHeight = 250;
 
-    return expenditures.length >= 2
-        ? Container(
-            padding: EdgeInsets.all(8),
-            child: Column(
+    return Container(
+      margin: EdgeInsets.all(8),
+      child: expenditures.length >= 2
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 TimeSeriesExpenditures(
                   graphHeight,
                   expenditures: expenditures,
                   currentMonth: widget.currentMonth,
                 ),
+                PieChartModeDistribution(
+                  graphHeight,
+                  expenditures: expenditures,
+                  currentMonth: widget.currentMonth,
+                ),
               ],
+            )
+          : Container(
+              // TODO: Create a vector here
+              child: Text('Not enough data'),
             ),
-          )
-        : Container(
-            // TODO: Create a vector here
-            child: Text('Not enough data'),
-          );
+    );
   }
 }
