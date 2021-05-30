@@ -137,7 +137,7 @@ class _AppNavigatorState extends State<AppNavigator> {
         page = AddNewExpenditure(onBackPressed: _onBackPressed);
         break;
       case analyticsPage:
-        page = Analytics();
+        page = AnalyticsPage();
         break;
       case settingsPage:
         page = Settings();
