@@ -1,7 +1,6 @@
 import 'package:expenditure/models/expenditure_item.dart';
 import 'package:expenditure/models/expenditures.dart';
 import 'package:expenditure/screens/crud_expenditure/edit_expenditure.dart';
-import 'package:expenditure/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
