@@ -45,3 +45,6 @@ const List<Map<String, dynamic>> PAYMENT_MODES = [
     'icon': MdiIcons.bank,
   },
 ];
+
+const String timestampFormat = 'd MMM, h:mm a';
+const String dayMonthFormat = 'd MMM';
