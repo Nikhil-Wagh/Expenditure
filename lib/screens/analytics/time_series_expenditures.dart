@@ -90,22 +90,34 @@ class FlChartLineChart extends StatelessWidget {
             show: true,
             horizontalInterval: intervalY,
           ),
+          lineTouchData: LineTouchData(
+            touchTooltipData: LineTouchTooltipData(
+                // maxContentWidth: 100,
+                getTooltipItems: (touchedSpots) {
+              return touchedSpots.map((LineBarSpot touchedSpot) {
+                final textStyle = TextStyle(
+                  color: touchedSpot.bar.colors[0],
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                );
+                return LineTooltipItem(
+                  '${_getDateString(touchedSpot.x)}, ${_getAmountString(touchedSpot.y)}',
+                  textStyle,
+                );
+              }).toList();
+            }),
+          ),
           titlesData: FlTitlesData(
             show: true,
             bottomTitles: SideTitles(
               showTitles: true,
               interval: 7,
-              getTitles: (value) => Utils.dayMonthFromDateTime(
-                DateTime(currentMonth.year, currentMonth.month, value.toInt()),
-              ),
+              getTitles: (value) => _getDateString(value),
               margin: 10,
             ),
             leftTitles: SideTitles(
               showTitles: true,
-              getTitles: (value) => NumberFormat.compactSimpleCurrency(
-                locale: Intl.defaultLocale,
-                decimalDigits: 1,
-              ).format(value),
+              getTitles: (value) => _getAmountString(value),
               margin: 10,
               interval: _maxAmount / 4,
               reservedSize: 30,
@@ -122,6 +134,19 @@ class FlChartLineChart extends StatelessWidget {
           ]),
       // swapAnimationDuration: Duration(seconds: 5),
     );
+  }
+
+  String _getDateString(double x) {
+    return Utils.dayMonthFromDateTime(
+      DateTime(currentMonth.year, currentMonth.month, x.toInt()),
+    );
+  }
+
+  String _getAmountString(double y) {
+    return NumberFormat.compactSimpleCurrency(
+      locale: Intl.defaultLocale,
+      decimalDigits: 1,
+    ).format(y);
   }
 
   List<FlSpot> _spots(Expenditures expenditures) {
