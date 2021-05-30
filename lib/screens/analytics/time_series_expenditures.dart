@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:expenditure/models/expenditure_item.dart';
 import 'package:expenditure/models/expenditures.dart';
 import 'package:expenditure/utils.dart';
@@ -55,17 +57,27 @@ class TimeSeriesExpenditures extends StatelessWidget {
 }
 
 class FlChartLineChart extends StatelessWidget {
+  static const String TAG = 'FlChartLineChart';
+
   final Expenditures expenditures;
   final DateTime currentMonth;
   FlChartLineChart(this.expenditures, this.currentMonth);
 
   @override
   Widget build(BuildContext context) {
-    double _maxAmount = expenditures.maxAmount;
-    double _minAmount = expenditures.minAmount;
+    List<FlSpot> spots = _spots(expenditures);
 
-    double maxY = _maxAmount + _minAmount;
+    double _minAmount = double.infinity;
+    double _maxAmount = double.negativeInfinity;
+
+    spots.forEach((e) {
+      _minAmount = min(_minAmount, e.y);
+      _maxAmount = max(_maxAmount, e.y);
+    });
+
+    double maxY = _minAmount + _maxAmount;
     double maxX = DateTime(currentMonth.year, currentMonth.month + 1, 0).day.toDouble();
+    debugPrint('[debug] $TAG, maxX: $maxX, maxY: $maxY');
     double intervalY = maxY / 5;
     return LineChart(
       LineChartData(
@@ -101,7 +113,7 @@ class FlChartLineChart extends StatelessWidget {
           ),
           lineBarsData: [
             LineChartBarData(
-              spots: _spots(expenditures),
+              spots: spots,
               dotData: FlDotData(show: true),
               isCurved: true,
               gradientFrom: Offset(0.5, 0.5),
@@ -113,12 +125,21 @@ class FlChartLineChart extends StatelessWidget {
   }
 
   List<FlSpot> _spots(Expenditures expenditures) {
-    // TODO: group by date
     List<FlSpot> spots = [];
-    for (Expenditure e in expenditures.items) {
+    for (int i = 0; i < expenditures.length; i++) {
+      Expenditure e = expenditures[i];
+      double amountForTheDay = e.amount.value;
+
+      // Added amount of expenditures for that day
+      // Expenditures are always sorted by timestamp
+      while (i < expenditures.length - 1 && expenditures[i].timestamp.toDate().day <= expenditures[i + 1].timestamp.toDate().day) {
+        amountForTheDay += expenditures[i + 1].amount.value;
+        i++;
+      }
+
       FlSpot spot = FlSpot(
         e.timestamp.toDate().day.toDouble(),
-        e.amount.toDouble(),
+        amountForTheDay,
       );
       spots.add(spot);
     }

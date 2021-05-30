@@ -72,22 +72,6 @@ class Expenditures extends ChangeNotifier {
     return "{items: ${items.toString()}, selectedExpenditureRef: $selectedExpenditureRef}";
   }
 
-  get maxAmount {
-    double _maxAmount = double.negativeInfinity;
-    for (Expenditure e in items) {
-      _maxAmount = max(_maxAmount, e.amount.value);
-    }
-    return _maxAmount;
-  }
-
-  get minAmount {
-    double _minAmount = double.infinity;
-    for (Expenditure e in items) {
-      _minAmount = min(_minAmount, e.amount.value);
-    }
-    return _minAmount;
-  }
-
   Expenditures where(bool Function(Expenditure) test) {
     return Expenditures(items.where(test).toList());
   }
