@@ -6,13 +6,13 @@ class ListItemExpenditure extends StatelessWidget {
   final int id;
   final bool selected;
   final Function(Expenditure) onTapHandler;
-  final Function(Expenditure) onLongPressHandler;
+  final Function(Expenditure) onMoreOptionsPressHandler;
   ListItemExpenditure({
     @required this.id,
     @required this.expenditure,
     @required this.selected,
     @required this.onTapHandler,
-    this.onLongPressHandler,
+    this.onMoreOptionsPressHandler,
   });
 
   static const _borderRadius = BorderRadius.all(Radius.circular(10));
@@ -35,10 +35,6 @@ class ListItemExpenditure extends StatelessWidget {
           print('[info] $TAG tapped');
           onTapHandler(expenditure);
         },
-        onLongPress: () {
-          debugPrint('[info] $TAG long press');
-          onLongPressHandler(expenditure);
-        },
         child: Ink(
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
           decoration: BoxDecoration(
@@ -46,48 +42,61 @@ class ListItemExpenditure extends StatelessWidget {
             border: Border.all(color: Colors.black, width: 3),
             borderRadius: _borderRadius,
           ),
-          child: Column(
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.shopping_cart,
-                        color: Colors.white,
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        expenditure.description,
-                        style: TextStyle(color: Colors.white),
-                        softWrap: true,
-                      ),
-                    ],
+                  Icon(
+                    Icons.shopping_cart,
+                    color: Colors.white,
                   ),
+                  SizedBox(width: 8),
                   Text(
-                    expenditure.amount.toString(),
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
+                    expenditure.description,
+                    style: TextStyle(color: Colors.white),
+                    softWrap: true,
                   ),
                 ],
               ),
-              SizedBox(height: 2),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisSize: MainAxisSize.max,
                 children: [
-                  Text(
-                    expenditure.timestampToString(),
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontStyle: FontStyle.italic,
-                      fontSize: 12,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        expenditure.amount.toString(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                      SizedBox(height: 2),
+                      Text(
+                        expenditure.timestampToString(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontStyle: FontStyle.italic,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ),
+                  SizedBox(width: 8),
+                  // Icon(Icons.more_vert, color: Colors.white),
+                  if (onMoreOptionsPressHandler != null)
+                    IconButton(
+                      color: Colors.white,
+                      padding: EdgeInsets.all(0.0),
+                      onPressed: () => onMoreOptionsPressHandler(expenditure),
+                      icon: Icon(Icons.more_vert),
+                      constraints: BoxConstraints(maxWidth: 32),
+                    )
                 ],
               ),
             ],
