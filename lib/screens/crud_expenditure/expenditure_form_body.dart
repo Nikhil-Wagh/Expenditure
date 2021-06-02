@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:expenditure/constants.dart';
 import 'package:expenditure/models/expenditure_item.dart';
+import 'package:expenditure/models/expenditures.dart';
 import 'package:expenditure/models/mode_item.dart';
 import 'package:expenditure/services/database.dart';
 import 'package:expenditure/utils/input_validator.dart';
@@ -13,6 +14,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 
 // For DateFormat
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class ExpenditureFormBody extends StatefulWidget {
   final Expenditure expenditure;
@@ -45,6 +47,10 @@ class _ExpenditureFormBodyState extends State<ExpenditureFormBody> {
   ));
   TextEditingController _amountFieldController = TextEditingController();
 
+  // NOTE: Don't like this. Form doesn't need to know about expenditures.
+  // TODO: Check if we can return the updated/added expenditure and select that
+  Expenditures expenditures;
+
   @override
   void initState() {
     debugPrint('[debug] $TAG, initializing state');
@@ -66,6 +72,7 @@ class _ExpenditureFormBodyState extends State<ExpenditureFormBody> {
 
   @override
   Widget build(BuildContext context) {
+    expenditures = Provider.of<Expenditures>(context);
     debugPrint('[debug] building $TAG');
     if (_modeItems.isEmpty) {
       for (Map mode in PAYMENT_MODES) {
@@ -260,6 +267,7 @@ class _ExpenditureFormBodyState extends State<ExpenditureFormBody> {
       SnackBar _successSnackBar = SnackBar(
         content: Text('Expenditure saved successfully'),
       );
+      expenditures.select(newExpenditure);
       ScaffoldMessenger.of(context).showSnackBar(_successSnackBar);
       widget.onSaved();
     }).catchError((error) {
