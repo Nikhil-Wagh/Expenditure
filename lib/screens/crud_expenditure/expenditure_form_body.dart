@@ -43,10 +43,17 @@ class _ExpenditureFormBodyState extends State<ExpenditureFormBody> {
       text: DateFormat(timestampFormat).format(
     DateTime.now(),
   ));
+  TextEditingController _amountFieldController = TextEditingController();
 
   @override
   void initState() {
+    debugPrint('[debug] $TAG, initializing state');
+
     if (widget.expenditure != null) {
+      _amountFieldController.text = NumberFormat.decimalPattern(
+        Intl.defaultLocale,
+      ).format(widget.expenditure.amount.value);
+
       debugPrint('[info] Edit Expenditure called: ${widget.expenditure}');
       debugPrint('[debug] Building Timestamp Controller with initial data = '
           '${widget.expenditure.timestamp}');
@@ -89,12 +96,21 @@ class _ExpenditureFormBodyState extends State<ExpenditureFormBody> {
   }
 
   Widget _buildAmountField() {
-    TextEditingController _controller = TextEditingController();
-    _controller.text = widget.expenditure != null ? NumberFormat.decimalPattern(Intl.defaultLocale).format(widget.expenditure.amount.value) : '';
+    debugPrint('[debug] $TAG, Amount while rebuilding: ${_amountFieldController.text}');
+    // Controller might have some value when the widget is rebuilding
+    if (_amountFieldController.text == null) {
+      // Otherwise take value from the expenditure item
+      _amountFieldController.text = widget.expenditure != null
+          ? NumberFormat.decimalPattern(
+              Intl.defaultLocale,
+            ).format(widget.expenditure.amount.value)
+          : '';
+    }
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
-        controller: _controller,
+        controller: _amountFieldController,
         keyboardType: TextInputType.number,
         decoration: InputDecoration(
           border: OutlineInputBorder(),
@@ -109,7 +125,7 @@ class _ExpenditureFormBodyState extends State<ExpenditureFormBody> {
             int.parse(string.replaceAll(',', '')),
           );
           debugPrint('NEW STRING = $newString');
-          _controller.value = TextEditingValue(
+          _amountFieldController.value = TextEditingValue(
             text: newString,
             selection: TextSelection.collapsed(offset: newString.length),
           );
