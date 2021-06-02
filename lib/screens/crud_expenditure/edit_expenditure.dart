@@ -48,8 +48,31 @@ class _EditExpenditureState extends State<EditExpenditure> {
 
   Widget _buildDeleteExpenditureAction() {
     return IconButton(
-      onPressed: () => _deleteExpenditure(widget.expenditure),
-      // onPressed: () => DatabaseService.removeExpenditure(widget.expenditure),
+      onPressed: () async {
+        bool confirmDelete = await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+                  title: Text('Delete expenditure?'),
+                  content: Text('Are you sure, you want to delete this item?'),
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.of(
+                              context,
+                              rootNavigator: true,
+                            ).pop(false),
+                        child: Text('No')),
+                    TextButton(
+                        onPressed: () => Navigator.of(
+                              context,
+                              rootNavigator: true,
+                            ).pop(true),
+                        child: Text('Yes')),
+                  ],
+                ));
+        if (confirmDelete) {
+          _deleteExpenditure(widget.expenditure);
+        }
+      },
       icon: Icon(Icons.delete),
       padding: EdgeInsets.all(0),
       iconSize: 28,
