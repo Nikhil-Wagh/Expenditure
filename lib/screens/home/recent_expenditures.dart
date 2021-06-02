@@ -86,7 +86,7 @@ class _ListExpendituresState extends State<ListExpenditures> {
             expenditure: expenditures[index],
             selected: expenditures[index].ref == expenditures.selectedExpenditureRef,
             onTapHandler: _expenditureOnTapHandler,
-            onLongPressHandler: _expenditureOnLongPressHandler,
+            onMoreOptionsPressHandler: _expenditureOnMoreOptionsPressHandler,
           );
         },
       ),
@@ -110,7 +110,7 @@ class _ListExpendituresState extends State<ListExpenditures> {
     );
   }
 
-  void _expenditureOnLongPressHandler(Expenditure element) {
+  void _expenditureOnMoreOptionsPressHandler(Expenditure element) {
     debugPrint('[debug] $TAG.expenditureOnLongPressHandler called for expenditure ' + element.toString());
     expenditures.select(element);
     _editExpenditure(element);
