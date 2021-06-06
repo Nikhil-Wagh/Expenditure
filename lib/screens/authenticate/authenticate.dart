@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:expenditure/constants.dart';
 import 'package:expenditure/screens/loaders/loading_auth.dart';
 import 'package:expenditure/services/auth.dart';
+import 'package:expenditure/services/database.dart';
 import 'package:flutter/material.dart';
 
 class Authenticate extends StatefulWidget {
@@ -316,6 +317,7 @@ class _AuthenticateState extends State<Authenticate> with SingleTickerProviderSt
               dynamic result = await _auth.signInWithGoogle();
               if (result.hasErrors()) {
                 error = result.errorMessage();
+                DatabaseService().updateUserData(result.user);
               }
             },
           ),

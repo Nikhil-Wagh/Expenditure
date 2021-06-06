@@ -38,11 +38,11 @@ class _AppNavigatorState extends State<AppNavigator> {
       activeIcon: Icon(Icons.bar_chart),
       label: 'Analytics',
     ),
-    BottomNavigationBarItem(
-      icon: Icon(Icons.settings_outlined),
-      activeIcon: Icon(Icons.settings),
-      label: 'Settings',
-    ),
+    // BottomNavigationBarItem(
+    //   icon: Icon(Icons.settings_outlined),
+    //   activeIcon: Icon(Icons.settings),
+    //   label: 'Settings',
+    // ),
   ];
 
   @override
@@ -93,8 +93,8 @@ class _AppNavigatorState extends State<AppNavigator> {
         case 2:
           _onAnalyticsPressed();
           break;
-        case 3:
-          _onSettingsPressed();
+          // case 3:
+          //   _onSettingsPressed();
           break;
       }
     });
@@ -139,8 +139,8 @@ class _AppNavigatorState extends State<AppNavigator> {
       case analyticsPage:
         page = AnalyticsPage();
         break;
-      case settingsPage:
-        page = Settings();
+        // case settingsPage:
+        //   page = Settings();
         break;
     }
 
@@ -148,7 +148,7 @@ class _AppNavigatorState extends State<AppNavigator> {
       builder: (context) {
         return page;
       },
-      settings: settings,
+      // settings: settings,
     );
   }
 }

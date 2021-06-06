@@ -1,5 +1,4 @@
 import 'package:expenditure/models/user.dart';
-import 'package:expenditure/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
@@ -16,6 +15,7 @@ class AuthService {
    * Including sign in and sign up
    * Returns instance of AuthResult
    */
+  static const String TAG = 'AuthService';
 
   final auth.FirebaseAuth _firebaseAuth = auth.FirebaseAuth.instance;
 
@@ -92,7 +92,6 @@ class AuthService {
     auth.UserCredential userCredential = await _firebaseAuth.signInWithCredential(googleAuthCredential);
     auth.User firebaseUser = userCredential.user;
     User user = userFromFirebaseUser(firebaseUser);
-    DatabaseService().updateUserData(user);
     return AuthResult(user: user);
   }
 
