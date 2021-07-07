@@ -30,6 +30,7 @@
 .pub-cache/
 .pub/
 /build/
+ios/build
 
 # Web related
 lib/generated_plugin_registrant.dart
@@ -40,5 +41,11 @@ app.*.symbols
 # Obfuscation related
 app.*.map.json
 
+# Google services secrets
+android/app/google-services.json
+
 # Exceptions to above rules.
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+
+# firestore rules
+firestore.rules
